@@ -9,7 +9,7 @@ using UnityEngine;
 public class FaceGraph : MonoBehaviour
 {
 
-    [SerializeField] public Face rootFace; // TODO change to private
+    [SerializeField] private Face rootFace; // TODO change to private
     [SerializeField] private int numberOfFaces = 0;
     public bool runButton = false;
 
@@ -22,12 +22,12 @@ public class FaceGraph : MonoBehaviour
 
         public override Face GetNode1Of(Axis edge)
         {
-            return edge.face1;
+            return edge.GetFace1();
         }
 
         public override Face GetNode2Of(Axis edge)
         {
-            return edge.face2;
+            return edge.GetFace2();
         }
 
         public override Face GetOtherNodeOf(Axis edge, Face excludeNode)
@@ -94,9 +94,9 @@ public class FaceGraph : MonoBehaviour
             directedEdge.edge.transform.parent = directedEdge.parent.transform;
             if (directedEdge.edge.IsSelected())
             {
-                Face parent = directedEdge.parent;
-                Face child = directedEdge.child;
-                if (parent==null || child==null || componentOf[parent]!=componentOf[child])
+                Face face1 = directedEdge.edge.GetFace1();
+                Face face2 = directedEdge.edge.GetFace2();
+                if (face1 == null || face2 == null || componentOf[face1] !=componentOf[face2])
                     directedEdge.edge.Disconnect();
             }
             if (directedEdge.child != null)

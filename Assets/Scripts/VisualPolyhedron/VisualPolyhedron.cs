@@ -11,6 +11,7 @@ public class VisualPolyhedron : MonoBehaviour
 
     private List<Axis> edges;
     private List<FaceMesh> faces;
+    public FaceMesh RootFace { get; set; }
 
     private void Awake()
     {
@@ -58,6 +59,7 @@ public class VisualPolyhedron : MonoBehaviour
     }
 
     private AbstractGroupPolyhedron absPolyhedron;
+
     public void SetAbstractPolyhedron(AbstractGroupPolyhedron absPolyhedron)
     {
         this.absPolyhedron = absPolyhedron;
@@ -66,5 +68,14 @@ public class VisualPolyhedron : MonoBehaviour
     public bool NearRotationAxis(Vector3 v, float error)
     {
         return absPolyhedron.NearRotationAxis(v, error);
+    }
+
+    public IEnumerable<FaceMesh> GetFaces()
+    {
+        return faces;
+    }
+    public IEnumerable<Axis> GetEdges()
+    {
+        return edges;
     }
 }

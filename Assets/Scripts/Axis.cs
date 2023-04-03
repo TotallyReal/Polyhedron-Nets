@@ -6,9 +6,9 @@ using UnityEngine;
 public class Axis : MonoBehaviour
 {
 
-    public Face face1;
-    public Face face2;
-    public Transform visual;
+    [SerializeField] private Face face1;
+    [SerializeField] private Face face2;
+    [SerializeField] private Transform visual;
     private Vector3 direction, worldDirection;
     private MouseTarget target;
     private float angle;
@@ -18,9 +18,39 @@ public class Axis : MonoBehaviour
 
     void Start()
     {
-        face1.edges.Add(this);
-        face2.edges.Add(this);
         target = GetComponentInChildren<MouseTarget>();
+    }
+
+    public void SetFace1(Face face)
+    {
+        if (face == face1)
+            return;
+        if (face1 != null)
+            face1.edges.Remove(this);
+        if (face != null)
+            face.edges.Add(this);
+        face1 = face;
+    }
+
+    public Face GetFace1()
+    {
+        return face1;
+    }
+
+    public void SetFace2(Face face)
+    {
+        if (face == face2)
+            return;
+        if (face2 != null)
+            face2.edges.Remove(this);
+        if (face != null)
+            face.edges.Add(this);
+        face2 = face;
+    }
+
+    public Face GetFace2()
+    {
+        return face2;
     }
 
     public void SetVisual(Vector3 from, Vector3 to)

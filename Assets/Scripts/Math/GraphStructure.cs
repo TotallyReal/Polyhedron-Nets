@@ -102,7 +102,7 @@ abstract public class GraphStructure<GraphNode, GraphEdge> where GraphNode : cla
         return directedEdges;
     }
 
-    // When running DFS and goind over an edge e:v->u there are several possibilities
+    // When running DFS and going over an edge e:v->u there are several possibilities
     //  0. For some reason, u is just null ...
     //  1. The edge leads back to the parent(namely, we used u->v to discover v).
     //  2. The edge leads to an already visited node (and in particular it is part of a simple cycle).
