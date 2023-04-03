@@ -56,4 +56,15 @@ public class VisualPolyhedron : MonoBehaviour
             edge.SetMaterial(edgeMaterial);
         }
     }
+
+    private AbstractGroupPolyhedron absPolyhedron;
+    public void SetAbstractPolyhedron(AbstractGroupPolyhedron absPolyhedron)
+    {
+        this.absPolyhedron = absPolyhedron;
+    }
+
+    public bool NearRotationAxis(Vector3 v, float error)
+    {
+        return absPolyhedron.NearRotationAxis(v, error);
+    }
 }

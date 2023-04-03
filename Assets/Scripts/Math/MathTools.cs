@@ -1,5 +1,7 @@
+using MathNet.Numerics.LinearAlgebra;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -17,6 +19,30 @@ static public class MathTools {
         if (inWorldSpace)
             rotationAxis = transform.InverseTransformDirection(rotationAxis);
         transform.Rotate(rotationAxis, angle);
+    }
+
+    public static Vector3 RandomVector3(float minX, float maxX, float minY, float maxY, float minZ, float maxZ)
+    {
+        return new Vector3(
+            Random.Range(minX, maxX),
+            Random.Range(minY, maxY),
+            Random.Range(minZ, maxZ)
+            );
+    }
+
+    public static bool TryApproximateEigenvalue(
+        Matrix<float> matrix, float eigenvalue, int dim, float error, out Vector<float> eigenvector) 
+    {
+        matrix -= eigenvalue * Matrix<float>.Build.SparseIdentity(dim, dim);
+        MathNet.Numerics.LinearAlgebra.Factorization.Svd<float> svd = matrix.Svd();
+        double smallestEigenvalue = svd.S.Last();
+        if (smallestEigenvalue < error)
+        {
+            eigenvector = svd.VT.Row(dim - 1);
+            return true;
+        }
+        eigenvector = null;
+        return false;
     }
 
 }

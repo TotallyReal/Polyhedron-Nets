@@ -6,9 +6,13 @@ using System.Linq;
 using System.Xml.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.IMGUI.Controls.PrimitiveBoundsHandle;
 
 public class AbstractGroupPolyhedron : AbstractPolyhedron
 {
+
+    private readonly IsometryGroup group;
+    private List<Vector3> axes;
 
     public Vector3 Aug4to3(params float[] x)
     {
@@ -76,7 +80,8 @@ public class AbstractGroupPolyhedron : AbstractPolyhedron
 
     public AbstractGroupPolyhedron(Matrix vertexStabilizerMatrix, Matrix faceStabilizerMatrix, Vector3 vertex)
     {
-        IsometryGroup group = IsometryGroup.GenerateFullGroup(vertexStabilizerMatrix, faceStabilizerMatrix);
+        group = IsometryGroup.GenerateFullGroup(vertexStabilizerMatrix, faceStabilizerMatrix);
+        axes = new List<Vector3>();
         // Create all the vertices, and connect them to the vertex stabilizer cosets
 
         // TODO find a better way to extract the generators
@@ -125,7 +130,32 @@ public class AbstractGroupPolyhedron : AbstractPolyhedron
             }
             AddFace(faceVertexIndices, $"Face({faceCoset.Name})", Vector3.zero);
         }
+
+        ComputeRotationAxes();
     }
+
+    private void ComputeRotationAxes()
+    {
+        foreach (IsoElement g in group)
+        {
+            if (g == group.Identity())
+                continue;
+            g.GetPresentation(out Vector3 axis, out _);
+            axes.Add(axis.normalized);
+        }
+    }
+
+    public bool NearRotationAxis(Vector3 v, float error)
+    {
+        v = v.normalized;
+        foreach (var axis in axes)
+        {
+            if ((axis - v).magnitude < error || (axis + v).magnitude < error)
+                return true;
+        }
+        return false;
+    }
+
     /*
 
     public AbstractGroupPolyhedron(float radius)

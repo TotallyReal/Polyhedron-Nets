@@ -228,4 +228,5 @@ public class AbstractPolyhedron
         return (from v in vertices
                 select v.position).ToArray<Vector3>();
     }
+
 }

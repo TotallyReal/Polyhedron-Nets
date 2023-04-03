@@ -25,8 +25,20 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [SerializeField] private float numberLabelDistance = 0.003f;
     [SerializeField] private RotatorArrow rotatorArrow;
     [SerializeField] private NumberedCanvas numberedCanvasPrefab;
+    [SerializeField] private bool touchMe;
+
+    private void OnValidate()
+    {
+        if (touchMe)
+        {
+            /*IsometryGroup group = new IsometryGroup();
+            IsoElement g = group.AddElement(Matrix.Rotation3(1, 1, 1, 2 * Mathf.PI / 3));
+            g.GetPresentation(out Vector3 v, out bool flip);*/
+        }
+    }
 
     private GameObject polyhedron = null;
+    private VisualPolyhedron visualPolyhedron;
     private FaceGraph graph;
 
     private void Awake()
@@ -50,7 +62,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
             new Vector3Int(-1,0,0),
         }, new Vector3Int(0, -2, 0), new Vector3Int(0, -1, 0), 5);*/
         //AbstractPolyhedron abstractPolyhedron = AbstractPolyhedron.CreateCube(5);
-        AbstractPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Dodecahedron(10);
+        AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Dodecahedron(10);
         //AbstractPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Isocahedron(10); // = AbstractPolyhedron.CreateCube(5);
 
         FaceMesh rootFace = CreatePolyhedron(abstractPolyhedron);
@@ -61,7 +73,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
 
     }
 
-    public FaceMesh CreatePolyhedron(Vector3[] vertices, List<int[]> facesList)
+    /*public FaceMesh CreatePolyhedron(Vector3[] vertices, List<int[]> facesList) // TODO restore this method
     {
         AbstractPolyhedron absPolyhedron = new AbstractPolyhedron();
         foreach (Vector3 v in vertices)
@@ -74,7 +86,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
         }
 
         return CreatePolyhedron(absPolyhedron);
-    }
+    }*/
 
     /// <summary>
     /// Create a new face from the given vertices.
@@ -101,14 +113,15 @@ public class VisualPolyhedronFactory : MonoBehaviour
         return face;
     }
 
-    public FaceMesh CreatePolyhedron(AbstractPolyhedron absPolyhedron)
+    public FaceMesh CreatePolyhedron(AbstractGroupPolyhedron absPolyhedron)
     {
         if (polyhedron != null)
         {
             Destroy(polyhedron);
         }
         polyhedron = new GameObject("Polyhedron");
-        VisualPolyhedron visualPolyhedron = polyhedron.AddComponent<VisualPolyhedron>();
+        visualPolyhedron = polyhedron.AddComponent<VisualPolyhedron>();
+        visualPolyhedron.SetAbstractPolyhedron(absPolyhedron);
         rotatorArrow.SetObjectToRotate(polyhedron.transform);
 
         Dictionary<(int, int), Axis> edgesDict = new Dictionary<(int, int), Axis>();
@@ -134,6 +147,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
             return edge;
         }
 
+        List<FaceMesh> faces = new List<FaceMesh>();
         FaceMesh rootFace = null;
         int faceIndex = 0;
 
@@ -163,7 +177,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
                 rotationAxis = Vector3.Cross(normalDir, polyhedron.transform.up);
                 rotationAngle = 180 - Vector3.Angle(normalDir, polyhedron.transform.up);
             }
-            face.transform.Rotate(rotationAxis, -rotationAngle);
+            faces.Add(face);
 
             // find\create the edges and connect them to the face
             foreach ((int i, int j) in abstractFace.EdgesIndices())
@@ -180,9 +194,14 @@ public class VisualPolyhedronFactory : MonoBehaviour
             }
         }
 
+        // rotate the polyhedron, so that the root face will be at the bottom.
         foreach (Axis axis in edgesDict.Values)
         {
             axis.transform.RotateAround(Vector3.zero, rotationAxis, -rotationAngle);
+        }
+        foreach (Face face in faces)
+        {
+            face.transform.Rotate(rotationAxis, -rotationAngle);
         }
 
         //Vector3 normalDir = rootFace.Normal();
@@ -198,5 +217,11 @@ public class VisualPolyhedronFactory : MonoBehaviour
 
     }
 
+    public bool NearAxis(Vector3 v, float error)
+    {
+        if (visualPolyhedron == null)
+            return false;
+        return visualPolyhedron.NearRotationAxis(v, error);
+    }
 }
 
