@@ -16,7 +16,7 @@ public class Axis : MonoBehaviour
 
     private float scale = 1f;
 
-    void Start()
+    void Awake()
     {
         target = GetComponentInChildren<MouseTarget>();
     }

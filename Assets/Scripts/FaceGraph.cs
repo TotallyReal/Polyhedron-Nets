@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using TMPro.EditorUtilities;
 using Unity.VisualScripting;
 using UnityEngine;
+using DirectedEdge = GraphStructure<Face, Axis>.DirectedEdge;
 
 public class FaceGraph : MonoBehaviour
 {
@@ -13,11 +15,21 @@ public class FaceGraph : MonoBehaviour
     [SerializeField] private int numberOfFaces = 0;
     public bool runButton = false;
 
-    class DFSFaceGraph : GraphStructure<Face, Axis>
+    class FaceGraphStructure : GraphStructure<Face, Axis>
     {
+        private bool randomizeEdges;
+
+        public FaceGraphStructure(bool randomizeEdges = true)
+        {
+            this.randomizeEdges = randomizeEdges;
+        }
+
         public override IEnumerable<Axis> GetEdgesOf(Face node)
         {
-            return node.edges;
+            if (randomizeEdges)
+                return MathTools.RandomList(node.edges);
+            else
+                return node.edges;
         }
 
         public override Face GetNode1Of(Axis edge)
@@ -36,11 +48,11 @@ public class FaceGraph : MonoBehaviour
         }
     }
 
-    private DFSFaceGraph dfsGraph;
+    private FaceGraphStructure dfsGraph;
 
     private void Awake()
     {
-        dfsGraph = new DFSFaceGraph();
+        dfsGraph = new FaceGraphStructure();
     }
 
     private void Start()
@@ -50,57 +62,120 @@ public class FaceGraph : MonoBehaviour
         input.Player.Graph.performed += CreateGraph;
     }
 
+    private bool IsFullTree(IEnumerable<DirectedEdge> directedEdges)
+    {
+        int treeEdges = directedEdges.Where(directedEdge => directedEdge.treeEdge).Count();
+        return treeEdges + 1 == numberOfFaces;
+    }
+
+    private void SetParentFromDirectedEdges(IEnumerable<DirectedEdge> directedEdges)
+    {
+        foreach (DirectedEdge directedEdge in directedEdges)
+        {
+            directedEdge.edge.transform.parent = directedEdge.parent.transform;
+
+            if (directedEdge.treeEdge && directedEdge.child != null)
+                directedEdge.child.transform.parent = directedEdge.edge.transform;
+        }
+    }
+
     private void CreateGraph(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         CreateTransformGraph();
     }
 
-    public void CreateTransformGraph()
+    private IEnumerable<DirectedEdge> CreateInitialGraph()
     {
-        Face root = rootFace;
-        if (root == null)
-            return;
-
-        Dictionary<Face, int> componentOf = dfsGraph.GetStronglyConnectedComponents(root);
-
+        if (rootFace == null)
+            return null;
 
         // Run a DFS algorithm on the faces as nodes, where we start at the root and two faces are connected in the graph
         // when there is an edge connecting them.
         // The returned list of edges contains the information of whether the edge is part of a cycle or not.
-        List<GraphStructure<Face, Axis>.DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(root);
+        List<DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(rootFace);
 
         // check if the graph is connected (tree edges = #nodes - 1)
-        // and move all the faces to be children of the root face.
-        int treeEdges = 0;
-        foreach (GraphStructure<Face, Axis>.DirectedEdge directedEdge in directedEdges)
+        if (!IsFullTree(directedEdges))
         {
-            // Just to make sure that we don't accidently create loops
-            directedEdge.edge.transform.parent = root.transform;
-            if (directedEdge.treeEdge)
-                treeEdges += 1;
-            if (directedEdge.child!=null) 
-                directedEdge.child.transform.parent = root.transform;
+            Debug.Log("The graph was disconnected");
+            return null;
         }
 
-        if (treeEdges + 1 < numberOfFaces)
+        // Move all the faces to be children of the root face.
+        foreach (DirectedEdge directedEdge in directedEdges)
+        {
+            // Just to make sure that we don't accidently create loops
+            directedEdge.edge.transform.parent = rootFace.transform;
+            if (directedEdge.child != rootFace && directedEdge.child != null)
+                directedEdge.child.transform.parent = rootFace.transform;
+        }
+
+        SetParentFromDirectedEdges(directedEdges);
+
+        return directedEdges;
+    }
+
+    public void CreateRandomGraph()
+    {
+        IEnumerable<DirectedEdge> directedEdges = CreateInitialGraph();
+
+        foreach (DirectedEdge directedEdge in directedEdges)
+        {
+            if (directedEdge.treeEdge)
+            {
+                directedEdge.edge.StartRotating(directedEdge.parent);
+            } else 
+            {
+                directedEdge.edge.Disconnect();
+            }
+        }
+    }
+
+    public void CreateTransformGraph()
+    {
+        /*Face root = rootFace;
+        if (root == null)
+            return;
+
+        // Run a DFS algorithm on the faces as nodes, where we start at the root and two faces are connected in the graph
+        // when there is an edge connecting them.
+        // The returned list of edges contains the information of whether the edge is part of a cycle or not.
+        List<DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(root);
+
+        // check if the graph is connected (tree edges = #nodes - 1)
+        if (!IsFullTree(directedEdges))
         {
             Debug.Log("The graph was disconnected");
             return;
         }
 
-        
-        foreach (GraphStructure<Face, Axis>.DirectedEdge directedEdge in directedEdges)
+        // Move all the faces to be children of the root face.
+        foreach (DirectedEdge directedEdge in directedEdges)
         {
-            directedEdge.edge.transform.parent = directedEdge.parent.transform;
+            // Just to make sure that we don't accidently create loops
+            directedEdge.edge.transform.parent = root.transform;
+            if (directedEdge.child!= root && directedEdge.child!=null) 
+                directedEdge.child.transform.parent = root.transform;
+        }
+
+        SetParentFromDirectedEdges(directedEdges);*/
+
+        IEnumerable<DirectedEdge> directedEdges = CreateInitialGraph();
+
+        Dictionary<Face, int> componentOf = dfsGraph.GetStronglyConnectedComponents(rootFace);
+        foreach (DirectedEdge directedEdge in directedEdges)
+        {
+            //directedEdge.edge.transform.parent = directedEdge.parent.transform;
             if (directedEdge.edge.IsSelected())
             {
                 Face face1 = directedEdge.edge.GetFace1();
                 Face face2 = directedEdge.edge.GetFace2();
-                if (face1 == null || face2 == null || componentOf[face1] !=componentOf[face2])
+                if (face1 == null || face2 == null || componentOf[face1] != componentOf[face2])
                     directedEdge.edge.Disconnect();
+                continue;
             }
-            if (directedEdge.child != null)
-                directedEdge.child.transform.parent = directedEdge.edge.transform;
+            //if (directedEdge.child != null)
+            //    directedEdge.child.transform.parent = directedEdge.edge.transform;
             if (directedEdge.seperatorEdge)
             {
                 directedEdge.edge.StartRotating(directedEdge.parent);

@@ -16,6 +16,7 @@ using Unity.VisualScripting;
 abstract public class GraphStructure<GraphNode, GraphEdge> where GraphNode : class
 {
 
+    #region ---------- The node and edge structure of the graph ----------
     abstract public IEnumerable<GraphEdge> GetEdgesOf(GraphNode node);
 
     abstract public GraphNode GetNode1Of(GraphEdge edge);
@@ -28,6 +29,193 @@ abstract public class GraphStructure<GraphNode, GraphEdge> where GraphNode : cla
         if (graphNode != excludeNode)
             return graphNode;
         return GetNode2Of(edge);
+    }
+
+    #endregion
+
+    #region ---------- DFS ----------
+
+    /// <summary>
+    /// When running DFS and going over an edge e:v-&gt;u there are several possibilities
+    /// <list type="number">
+    /// <item>
+    /// <description>For some reason, u is just null ...</description>
+    /// </item>
+    /// <item>
+    /// <description>
+    /// The edge leads back to the parent(namely, we used u-&gt;v to discover v).
+    /// </description>
+    /// </item>
+    /// <item>
+    /// <description>
+    /// The edge leads to an already visited node (and in particular it is part of a simple cycle).
+    /// </description>
+    /// </item>
+    /// <item>
+    /// <description>
+    /// This is the first time we discover u, and we haven't run the DFS on u
+    /// </description>
+    /// </item>
+    /// <item>
+    /// <description>
+    /// This is the first time we discover u, and we have just finished running the DFS on u.
+    /// </description>
+    /// </item>
+    /// </list>
+    /// <para>
+    /// 0. For some reason, u is just null ...
+    /// 1. The edge leads back to the parent(namely, we used u-&gt;v to discover v).
+    /// 2. The edge leads to an already visited node (and in particular it is part of a simple cycle).
+    /// 3. This is the first time we discover u, and we haven't run the DFS on u
+    /// 4. This is the first time we discover u, and we have just finished running the DFS on u
+    /// </para>
+    /// </summary>
+    public enum EdgeTravelType
+    {
+        NULL,
+        FIRST_DISCOVER,
+        AFTER_DISCOVER,
+        TO_PARENT,
+        ALREADY_DISCOVERED
+    }
+
+    public delegate void EdgeTravel(
+        GraphNode fromNode, int fromPosition, int fromSmallestVisited,
+        GraphNode toNode, int toPosition, int toSmallestVisited,
+        GraphEdge edge, EdgeTravelType travelType);
+
+    public void EmptyEdgeTravel(
+        GraphNode fromNode, int fromPosition, int fromSmallestVisited,
+        GraphNode toNode, int toPosition, int toSmallestVisited,
+        GraphEdge edge, EdgeTravelType travelType) { }
+
+    /// <summary>
+    /// Runs a DFS on the graph starting at the given root node.
+    /// When travelling along an edge, calls the callback method with an indication for the type of travel. See EdgeTravelType above.
+    /// </summary>
+    /// <param name="root"></param>
+    /// <param name="callback"></param>
+    public void DFS(GraphNode root, EdgeTravel callback = null)
+    {
+        Dictionary<GraphNode, (int, int)> nodePositions = new Dictionary<GraphNode, (int, int)> { { root, (0, 0) } };
+        _DFS(root, 0, null, nodePositions, callback);
+    }
+
+    /// <summary>
+    /// Runs a DFS on the graph. The process continues at the currentNode with the currentPosition,
+    /// and assumes that we got to this node through the parentNode. The positions of all the
+    /// previously visited nodes are in nodePositions. Every time the algorithm travels through an
+    /// edges, it calls the callback method.
+    /// </summary>
+    private int _DFS(
+        GraphNode currentNode, int currentPosition, GraphNode parentNode, 
+        Dictionary<GraphNode, (int, int)> nodePositions, EdgeTravel callback = null
+    )
+    {
+        callback = callback ?? EmptyEdgeTravel;
+
+        GraphNode nextNode;
+        int nextPosition = -1;
+        int smallestVisitedNodeIndex = currentPosition;
+        int nextSmallestVisitedNodeIndex = -1;
+
+        void Callback(GraphEdge edge, EdgeTravelType travelType)
+        {
+            callback(
+                currentNode, currentPosition, smallestVisitedNodeIndex, 
+                nextNode, nextPosition, nextSmallestVisitedNodeIndex, 
+                edge, travelType);
+        }
+
+        foreach (GraphEdge edge in GetEdgesOf(currentNode))
+        {
+            nextNode = GetOtherNodeOf(edge, currentNode);
+            nextPosition = -1;
+            nextSmallestVisitedNodeIndex = -1;
+
+            if (nextNode == null)
+            {
+                Callback(edge, EdgeTravelType.NULL);
+                continue;
+            }
+
+            if (!nodePositions.TryGetValue(nextNode, out (int position, int smallestIndex) nextNodeParameters))
+            {
+                // The edge leads to a new node, add it, and assign its position
+                nextPosition = nodePositions.Count;
+                nodePositions.Add(nextNode, (nextPosition, nextPosition));
+                Callback(edge, EdgeTravelType.FIRST_DISCOVER);
+
+                nextSmallestVisitedNodeIndex = _DFS(nextNode, nextPosition, currentNode, nodePositions, callback);
+                Callback(edge, EdgeTravelType.AFTER_DISCOVER);
+
+                smallestVisitedNodeIndex = Mathf.Min(smallestVisitedNodeIndex, nextSmallestVisitedNodeIndex);
+                nodePositions[currentNode] = (currentPosition, smallestVisitedNodeIndex);
+                continue;
+            }
+
+            nextPosition = nextNodeParameters.position;
+            nextSmallestVisitedNodeIndex = nextNodeParameters.smallestIndex;
+
+            // The edge back to the parent
+            if (nextNode == parentNode)
+            {
+                Callback(edge, EdgeTravelType.TO_PARENT);
+                continue;
+            }
+
+            // The edge leads to a visited node which is not the parent
+            smallestVisitedNodeIndex = Mathf.Min(smallestVisitedNodeIndex, nextPosition);
+            Callback(edge, EdgeTravelType.ALREADY_DISCOVERED);
+
+        }
+
+        return smallestVisitedNodeIndex;
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Find and returns all the "strongly connected components" in the connected component of the given root.
+    /// A connected component in this udirected graph is defined to be a maximal set of nodes such that each two nodes 
+    /// belong to a simple cycle. Alternatively, an edge does not belong to two vertices in the same component if
+    /// and only if removing it will cause the connected component of the root to become disconnected.
+    /// </summary>
+    /// <param name="root"></param>
+    /// <returns></returns>
+    public Dictionary<GraphNode, int> GetStronglyConnectedComponents(GraphNode root)
+    {
+        List<DirectedEdge> directedEdges = GetDirectedEdgesDFS(root);
+        HashSet<GraphEdge> separators = new HashSet<GraphEdge>();
+        separators.AddRange(from directedEdge in directedEdges where directedEdge.seperatorEdge select directedEdge.edge);
+        /*HashSet<GraphEdge> edges = new HashSet<GraphEdge>();
+        edges.AddRange(from directedEdge in directedEdges select directedEdge.edge);
+        Subgraph <GraphNode, GraphEdge> subgraph = new Subgraph<GraphNode, GraphEdge>(this, (edge) => edges.Contains(edge));*/
+
+        Dictionary<GraphNode, int> componentIndex = new Dictionary<GraphNode, int>();
+        componentIndex[root] = 0;
+        int index = 0;
+
+        void ComponentEdgeTravel(
+            GraphNode fromNode, int fromPosition, int fromSmallestVisited,
+            GraphNode toNode, int toPosition, int toSmallestVisited,
+            GraphEdge edge, EdgeTravelType travelType)
+        { 
+            if (travelType == EdgeTravelType.FIRST_DISCOVER)
+            {
+                if (separators.Contains(edge))
+                {
+                    index++;
+                    componentIndex[toNode] = index;
+                } else
+                {
+                    componentIndex[toNode] = componentIndex[fromNode];
+                }
+            }
+        }
+
+        DFS(root, ComponentEdgeTravel);
+        return componentIndex;
     }
 
     /// <summary>
@@ -45,7 +233,7 @@ abstract public class GraphStructure<GraphNode, GraphEdge> where GraphNode : cla
 
     /// <summary>
     /// Runs a DFS on the graph starting with the given node.
-    /// Returns a list of the edges 
+    /// Returns a list of the edges forming a spanning tree from the root.
     /// </summary>
     /// <param name="root"></param>
     public List<DirectedEdge> GetDirectedEdgesDFS(GraphNode root)
@@ -102,108 +290,7 @@ abstract public class GraphStructure<GraphNode, GraphEdge> where GraphNode : cla
         return directedEdges;
     }
 
-    // When running DFS and going over an edge e:v->u there are several possibilities
-    //  0. For some reason, u is just null ...
-    //  1. The edge leads back to the parent(namely, we used u->v to discover v).
-    //  2. The edge leads to an already visited node (and in particular it is part of a simple cycle).
-    //  3. This is the first time we discover u, and we haven't run the DFS on u
-    //  4. This is the first time we discover u, and we have just finished running the DFS on u
-
-    public enum EdgeTravelType
-    {
-        NULL,
-        FIRST_DISCOVER,
-        AFTER_DISCOVER,
-        TO_PARENT,
-        ALREADY_DISCOVERED
-    }
-
-    public delegate void EdgeTravel(
-        GraphNode fromNode, int fromPosition, int fromSmallestVisited,
-        GraphNode toNode, int toPosition, int toSmallestVisited,
-        GraphEdge edge, EdgeTravelType travelType);
-
-    public void EmptyEdgeTravel(
-        GraphNode fromNode, int fromPosition, int fromSmallestVisited,
-        GraphNode toNode, int toPosition, int toSmallestVisited,
-        GraphEdge edge, EdgeTravelType travelType) { }
-
-    public void DFS(GraphNode root, EdgeTravel callback = null)
-    {
-        Dictionary<GraphNode, (int, int)> nodePositions = new Dictionary<GraphNode, (int, int)> { { root, (0, 0) } };
-        _DFS(root, 0, null, nodePositions, callback);
-    }
-
-    /// <summary>
-    /// Always assume that currentNode is in nodePositions
-    /// </summary>
-    private int _DFS(
-        GraphNode currentNode, int currentPosition, GraphNode parent, 
-        Dictionary<GraphNode, (int, int)> nodePositions, EdgeTravel callback = null
-    )
-    {
-        callback = callback ?? EmptyEdgeTravel;
-
-        GraphNode nextNode;
-        int nextPosition = -1;
-        int smallestVisitedNodeIndex = currentPosition;
-        int nextSmallestVisitedNodeIndex = -1;
-
-        void Callback(GraphEdge edge, EdgeTravelType travelType)
-        {
-            callback(
-                currentNode, currentPosition, smallestVisitedNodeIndex, 
-                nextNode, nextPosition, nextSmallestVisitedNodeIndex, 
-                edge, travelType);
-        }
-
-        foreach (GraphEdge edge in GetEdgesOf(currentNode))
-        {
-            nextNode = GetOtherNodeOf(edge, currentNode);
-            nextPosition = -1;
-            nextSmallestVisitedNodeIndex = -1;
-
-            if (nextNode == null)
-            {
-                Callback(edge, EdgeTravelType.NULL);
-                continue;
-            }
-
-            if (!nodePositions.TryGetValue(nextNode, out (int position, int smallestIndex) nextNodeParameters))
-            {
-                // The edge leads to a new node, add it, and assign its position
-                nextPosition = nodePositions.Count;
-                nodePositions.Add(nextNode, (nextPosition, nextPosition));
-                Callback(edge, EdgeTravelType.FIRST_DISCOVER);
-
-                nextSmallestVisitedNodeIndex = _DFS(nextNode, nextPosition, currentNode, nodePositions, callback);
-                Callback(edge, EdgeTravelType.AFTER_DISCOVER);
-
-                smallestVisitedNodeIndex = Mathf.Min(smallestVisitedNodeIndex, nextSmallestVisitedNodeIndex);
-                nodePositions[currentNode] = (currentPosition, smallestVisitedNodeIndex);
-                continue;
-            }
-
-            nextPosition = nextNodeParameters.position;
-            nextSmallestVisitedNodeIndex = nextNodeParameters.smallestIndex;
-
-            // The edge back to the parent
-            if (nextNode == parent)
-            {
-                Callback(edge, EdgeTravelType.TO_PARENT);
-                continue;
-            }
-
-            // The edge leads to a visited node which is not the parent
-            smallestVisitedNodeIndex = Mathf.Min(smallestVisitedNodeIndex, nextPosition);
-            Callback(edge, EdgeTravelType.ALREADY_DISCOVERED);
-
-        }
-
-        return smallestVisitedNodeIndex;
-    }
-
-
+    #region To Delete
     /// <summary>
     /// Always assume that currentNode is in nodePositions
     /// </summary>
@@ -273,52 +360,8 @@ abstract public class GraphStructure<GraphNode, GraphEdge> where GraphNode : cla
 
         return smallestVisitedNodeIndex;
     }
-
-
-    /// <summary>
-    /// Find and returns all the "strongly connected components" in the connected component of the given root.
-    /// A connected component in this udirected graph is defined to be a maximal set of nodes such that each two nodes 
-    /// belong to a simple cycle. Alternatively, an edge does not belong to two vertices in the same component if
-    /// and only if removing it will cause the connected component of the root to become disconnected.
-    /// </summary>
-    /// <param name="root"></param>
-    /// <returns></returns>
-    public Dictionary<GraphNode, int> GetStronglyConnectedComponents(GraphNode root)
-    {
-        List<DirectedEdge> directedEdges = GetDirectedEdgesDFS(root);
-        HashSet<GraphEdge> separators = new HashSet<GraphEdge>();
-        separators.AddRange(from directedEdge in directedEdges where directedEdge.seperatorEdge select directedEdge.edge);
-        /*HashSet<GraphEdge> edges = new HashSet<GraphEdge>();
-        edges.AddRange(from directedEdge in directedEdges select directedEdge.edge);
-        Subgraph <GraphNode, GraphEdge> subgraph = new Subgraph<GraphNode, GraphEdge>(this, (edge) => edges.Contains(edge));*/
-
-        Dictionary<GraphNode, int> componentIndex = new Dictionary<GraphNode, int>();
-        componentIndex[root] = 0;
-        int index = 0;
-
-        void ComponentEdgeTravel(
-            GraphNode fromNode, int fromPosition, int fromSmallestVisited,
-            GraphNode toNode, int toPosition, int toSmallestVisited,
-            GraphEdge edge, EdgeTravelType travelType)
-        { 
-            if (travelType == EdgeTravelType.FIRST_DISCOVER)
-            {
-                if (separators.Contains(edge))
-                {
-                    index++;
-                    componentIndex[toNode] = index;
-                } else
-                {
-                    componentIndex[toNode] = componentIndex[fromNode];
-                }
-            }
-        }
-
-        DFS(root, ComponentEdgeTravel);
-        return componentIndex;
-    }
+    #endregion
 }
-
 
 public class Subgraph<GraphNode, GraphEdge> : GraphStructure<GraphNode, GraphEdge> where GraphNode : class
 {
@@ -350,92 +393,3 @@ public class Subgraph<GraphNode, GraphEdge> : GraphStructure<GraphNode, GraphEdg
 }   
 
 
-#region ----------------------------------------- Simple graph -----------------------------------------
-
-public class SimpleGraphNode
-{
-    public int index = -1;
-    public List<SimpleGraphEdge> edges = new List<SimpleGraphEdge>();
-
-    public bool Equals(SimpleGraphNode other)
-    {
-        return other == this;
-    }
-
-    public override string ToString()
-    {
-        return $"{index}";
-    }
-}
-
-public class SimpleGraphEdge
-{
-    public SimpleGraphNode node1, node2;
-
-    public override string ToString()
-    {
-        return $"{node1}-{node2}";
-    }
-}
-
-public class SimpleGraph : GraphStructure<SimpleGraphNode, SimpleGraphEdge>
-{
-
-    public SimpleGraphNode CreateGraph(int n, (int,int)[] edges)
-    {
-        SimpleGraphNode[] nodes = new SimpleGraphNode[n];
-        for (int i = 0; i < n; i++)
-        {
-            nodes[i] = new SimpleGraphNode { index = i };
-        }
-        foreach (var (i, j) in edges)
-        {
-            SimpleGraphEdge edge = new SimpleGraphEdge { node1 = nodes[i], node2 = nodes[j] };
-            nodes[i].edges.Add(edge);
-            nodes[j].edges.Add(edge);
-        }
-
-        return nodes[0];
-
-    }
-
-    public SimpleGraphNode CreateGraph(int[][] matrix)
-    {
-        int n = matrix.Length;
-        SimpleGraphNode[] nodes = new SimpleGraphNode[n];
-        for (int i = 0; i < n; i++)
-        {
-            nodes[i] = new SimpleGraphNode();
-            for (int j = 0; j < i; j++)
-            {
-                if (matrix[i][j] != 0)
-                {
-                    SimpleGraphEdge edge = new SimpleGraphEdge { node1 = nodes[i], node2 = nodes[j] };
-                    nodes[i].edges.Add(edge);
-                    nodes[j].edges.Add(edge);
-                }
-            }
-        }
-        return nodes[0];
-    }
-
-    public override IEnumerable<SimpleGraphEdge> GetEdgesOf(SimpleGraphNode node)
-    {
-        return node.edges;
-    }
-
-
-    public override SimpleGraphNode GetNode1Of(SimpleGraphEdge edge)
-    {
-        return edge.node1;
-    }
-
-
-    public override SimpleGraphNode GetNode2Of(SimpleGraphEdge edge)
-    {
-        return edge.node2;
-    }
-
-}
-
-#endregion

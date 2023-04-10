@@ -10,36 +10,43 @@ using UnityEngine;
 /// </summary>
 public class VisualPolyhedronFactory : MonoBehaviour
 {
-
     public static VisualPolyhedronFactory Instance { get; private set; } // TODO should I keep this static variable?
-
 
     [Header("Polyhedron components")]
     [SerializeField] private FaceMesh facePrefab;
     [SerializeField] private Material faceMaterial;
+    [SerializeField] private Material rootMaterial;
+    [Space(10)]
     [SerializeField] private Axis axisPrefab;
     [SerializeField] private Material edgeMaterial;
-    [SerializeField] private Material rootMaterial;
+    [Space(10)]
+    [SerializeField] private float numberLabelDistance = 0.003f;
+    [SerializeField] private NumberedCanvas numberedCanvasPrefab;
 
     [Header("MISC")]
-    [SerializeField] private float numberLabelDistance = 0.003f;
+    [ContextMenuItem("Variable menu", "VariableAction")]
     [SerializeField] private RotatorArrow rotatorArrow;
-    [SerializeField] private NumberedCanvas numberedCanvasPrefab;
     [SerializeField] private bool touchMe;
 
     private void OnValidate()
     {
         if (touchMe)
         {
-            /*IsometryGroup group = new IsometryGroup();
-            IsoElement g = group.AddElement(Matrix.Rotation3(1, 1, 1, 2 * Mathf.PI / 3));
-            g.GetPresentation(out Vector3 v, out bool flip);*/
         }
     }
 
-    private GameObject polyhedron = null;
-    private VisualPolyhedron visualPolyhedron;
-    private FaceGraph graph;
+    [ContextMenu("this is a context menu")]
+    private void MenuAction()
+    {
+        Debug.Log("Context menu");
+    }
+    private void VariableAction()
+    {
+        Debug.Log("Variable menu");
+    }
+
+    private VisualPolyhedron visualPolyhedron = null;
+    private VisualPolyhedron shadowVisualPolyhedron = null;
 
     private void Awake()
     {
@@ -65,7 +72,22 @@ public class VisualPolyhedronFactory : MonoBehaviour
         AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Dodecahedron(10);
         //AbstractPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Isocahedron(10); 
 
-        CreatePolyhedron(abstractPolyhedron);
+        if (visualPolyhedron != null)
+        {
+            Destroy(visualPolyhedron.gameObject);
+            //Destroy(shadowVisualPolyhedron.gameObject);
+        }
+
+        visualPolyhedron = CreatePolyhedron(abstractPolyhedron).GetComponent<VisualPolyhedron>();
+        visualPolyhedron.gameObject.name = "visual polyhedron";
+        ChooseTexture.Instance.SetVisualPolyhedron(visualPolyhedron); // TODO: remove
+
+        shadowVisualPolyhedron = CreatePolyhedron(abstractPolyhedron).GetComponent<VisualPolyhedron>();
+        shadowVisualPolyhedron.gameObject.name = "Shadow polyhedron";
+        shadowVisualPolyhedron.SetFaceMaterial(rootMaterial);
+
+        FaceGraph faceGraph = shadowVisualPolyhedron.GetComponent<FaceGraph>();
+        faceGraph.CreateRandomGraph();
     }
 
     /*public FaceMesh CreatePolyhedron(Vector3[] vertices, List<int[]> facesList) // TODO restore this method
@@ -91,9 +113,10 @@ public class VisualPolyhedronFactory : MonoBehaviour
     /// <param name="faceVertices"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    private FaceMesh CreateFace(Vector3[] faceVertices, int index, bool addNumbering = true)
+    private FaceMesh CreateFace(
+        VisualPolyhedron visualPolyhedron, Vector3[] faceVertices, int index, bool addNumbering = true)
     {
-        FaceMesh face = Instantiate<FaceMesh>(facePrefab, polyhedron.transform);
+        FaceMesh face = Instantiate<FaceMesh>(facePrefab, visualPolyhedron.transform);
         face.name = $"Face {index}";
         face.CreateMesh(faceVertices);
 
@@ -127,7 +150,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
                 !edgesDict.TryGetValue((index2, index1), out edge))
             {
                 // edge does not exist - create it
-                edge = Instantiate<Axis>(axisPrefab, polyhedron.transform);
+                edge = Instantiate<Axis>(axisPrefab, visualPolyhedron.transform);
                 edge.SetVisual(v1, v2);
 
                 edgesDict.Add((index1, index2), edge);
@@ -157,7 +180,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
             }
 
             // Create the face's GameObject
-            FaceMesh face = CreateFace(faceVertices, faceIndex++);
+            FaceMesh face = CreateFace(visualPolyhedron, faceVertices, faceIndex++);
             visualPolyhedron.AddFace(face);
             if (visualPolyhedron.RootFace == null)
             {
@@ -191,8 +214,8 @@ public class VisualPolyhedronFactory : MonoBehaviour
     private void RotatePolyhedron(VisualPolyhedron visualPolyhedron)
     {
         Vector3 normalDir = visualPolyhedron.RootFace.Normal();
-        Vector3 rotationAxis = Vector3.Cross(normalDir, polyhedron.transform.up);
-        float rotationAngle = 180 - Vector3.Angle(normalDir, polyhedron.transform.up);
+        Vector3 rotationAxis = Vector3.Cross(normalDir, visualPolyhedron.transform.up);
+        float rotationAngle = 180 - Vector3.Angle(normalDir, visualPolyhedron.transform.up);
 
         // rotate the polyhedron, so that the root face will be at the bottom.
         foreach (Axis axis in visualPolyhedron.GetEdges())
@@ -205,30 +228,27 @@ public class VisualPolyhedronFactory : MonoBehaviour
         }
     }
 
-    public void CreatePolyhedron(AbstractGroupPolyhedron absPolyhedron)
+    public GameObject CreatePolyhedron(AbstractGroupPolyhedron absPolyhedron)
     {
         // ------------------- create polyhedron object -------------------
-        if (polyhedron != null)
-        {
-            Destroy(polyhedron);
-        }
-        polyhedron = new GameObject("Polyhedron");
+        GameObject polyhedron = new GameObject("Polyhedron");
 
-        visualPolyhedron = polyhedron.AddComponent<VisualPolyhedron>();
+        VisualPolyhedron visualPolyhedron = polyhedron.AddComponent<VisualPolyhedron>();
         CreateFacesAndEdges(absPolyhedron, visualPolyhedron);
         RotatePolyhedron(visualPolyhedron);  // so that the root face will face downwards
 
         visualPolyhedron.SetFaceMaterial(faceMaterial);
         visualPolyhedron.SetEdgeMaterial(edgeMaterial);
-        ChooseTexture.Instance.SetVisualPolyhedron(visualPolyhedron); // TODO: remove
 
         // ------------------- face graph -------------------
-        graph = polyhedron.AddComponent<FaceGraph>();
+        FaceGraph graph = polyhedron.AddComponent<FaceGraph>();
         graph.SetPolyhedron(visualPolyhedron.RootFace, absPolyhedron.GetFaces().Count);
         visualPolyhedron.RootFace.SetMaterial(rootMaterial);
 
         // ------------------- rotator arrow -------------------
         rotatorArrow.SetObjectToRotate(polyhedron.transform); // TODO: remove 
+
+        return polyhedron;
     }
 
     public VisualPolyhedron GetVisualPolyhedron()
@@ -236,11 +256,10 @@ public class VisualPolyhedronFactory : MonoBehaviour
         return visualPolyhedron;
     }
 
-    public bool NearAxis(Vector3 v, float error)
+    public void CompareUnfolding()
     {
-        if (visualPolyhedron == null)
-            return false;
-        return visualPolyhedron.NearRotationAxis(v, error);
+        FaceGraph faceGraph = visualPolyhedron.GetComponent<FaceGraph>();
+        FaceGraph shadowFaceGraph = shadowVisualPolyhedron.GetComponent<FaceGraph>();
     }
 }
 

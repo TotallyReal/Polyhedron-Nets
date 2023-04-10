@@ -45,4 +45,24 @@ static public class MathTools {
         return false;
     }
 
+    public static int[] RandomPermutation(int n)
+    {
+        int[] numbers = new int[n];
+        for (int i = 0; i < n; i++)
+        {
+            numbers[i] = i;
+        }
+
+        return numbers.OrderBy(x => Random.Range(0f,1f)).ToArray();
+    }
+
+    public static IEnumerable<T> RandomList<T>(List<T> elements)
+    {
+        int[] numbers = RandomPermutation(elements.Count);
+        foreach (int i in numbers)
+        {
+            yield return elements[i];
+        }
+    }
+
 }

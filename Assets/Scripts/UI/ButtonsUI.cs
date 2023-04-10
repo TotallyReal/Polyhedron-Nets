@@ -9,6 +9,7 @@ public class ButtonsUI : MonoBehaviour
     [SerializeField] private FaceGraph faceGraph;
     [SerializeField] private Button unfoldButton;
     [SerializeField] private Button restartButton;
+    [SerializeField] private Button compareButton;
 
     // Start is called before the first frame update
     void Start()

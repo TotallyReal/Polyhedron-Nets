@@ -427,9 +427,9 @@ RectTransform:
   m_Father: {fileID: 291997670}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 260, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &82733623
@@ -1438,9 +1438,9 @@ RectTransform:
   m_Father: {fileID: 293958355}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 80, y: -32.600403}
   m_SizeDelta: {x: 150, y: 55.2008}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &523818767
@@ -1559,9 +1559,9 @@ RectTransform:
   m_Father: {fileID: 293958355}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 80, y: -92.80121}
   m_SizeDelta: {x: 150, y: 55.2008}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &565593515
@@ -1912,12 +1912,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   facePrefab: {fileID: 4496706682133013413, guid: d0f8c8e0b3f30ab48bb4f3bcad56487a, type: 3}
   faceMaterial: {fileID: 2100000, guid: 5f5c3feaa16d3db4bbedc36b5806493a, type: 2}
+  rootMaterial: {fileID: 2100000, guid: fe757b391b7a6194fb60777472e38a27, type: 2}
   axisPrefab: {fileID: 6820755328241383506, guid: 53a73507b27643f49880569680aaa671, type: 3}
   edgeMaterial: {fileID: 2100000, guid: cb6897aeb6ab9d24bafeee442e7017e2, type: 2}
-  rootMaterial: {fileID: 2100000, guid: fe757b391b7a6194fb60777472e38a27, type: 2}
   numberLabelDistance: 0.05
-  rotatorArrow: {fileID: 1510849239}
   numberedCanvasPrefab: {fileID: 5375164846631267126, guid: 6b7b10394835d0a46945efddac0c6860, type: 3}
+  rotatorArrow: {fileID: 1510849239}
   touchMe: 0
 --- !u!1 &649697804
 GameObject:
@@ -2979,9 +2979,9 @@ RectTransform:
   m_Father: {fileID: 291997670}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 50, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1043832681
@@ -4088,9 +4088,9 @@ RectTransform:
   m_Father: {fileID: 291997670}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 155, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1264491253
@@ -4209,9 +4209,9 @@ RectTransform:
   m_Father: {fileID: 291997670}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 470, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1285777818
@@ -5224,7 +5224,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1412306237}
   m_CullTransparentMesh: 1
---- !u!43 &1489040779
+--- !u!43 &1475832222
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5828,9 +5828,9 @@ RectTransform:
   m_Father: {fileID: 291997670}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 365, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1585862465
@@ -6053,7 +6053,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1677283403}
-  m_Mesh: {fileID: 1489040779}
+  m_Mesh: {fileID: 1475832222}
 --- !u!114 &1677283406
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6126,7 +6126,7 @@ MeshCollider:
   serializedVersion: 4
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1489040779}
+  m_Mesh: {fileID: 1475832222}
 --- !u!1 &1708161846
 GameObject:
   m_ObjectHideFlags: 0
