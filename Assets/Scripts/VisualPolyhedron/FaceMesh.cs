@@ -27,6 +27,15 @@ public class FaceMesh : Face
         Center = center / vertices.Length;
     }
 
+    /// <summary>
+    /// Returns the normal in the world space
+    /// </summary>
+    /// <returns>Normal in world space</returns>
+    public override Vector3 Normal()
+    {
+        return transform.TransformDirection(LocalNormal);
+    }
+
     public void CreateMesh(params Vector3[] vertices)
     {
         if (meshFilter == null)
@@ -41,6 +50,7 @@ public class FaceMesh : Face
         }
 
         UpdateCenter(vertices);
+        ComputeMaxAngle(vertices);
 
         // Assume that the next two vectors are not colinear.
         Vector3 v = (vertices[1] - vertices[0]).normalized;
@@ -48,6 +58,8 @@ public class FaceMesh : Face
         LocalNormal = Vector3.Cross(v, u).normalized;
         u = Vector3.Cross(LocalNormal, v).normalized;
         // at this point {u,v} is an orthonormal basis for the plane parallel to the face.
+
+
 
         int n = vertices.Length;
         Vector3[] doubleVertices = new Vector3[2 * n];
@@ -86,13 +98,18 @@ public class FaceMesh : Face
         meshCollider.sharedMesh = mesh;
     }
 
+    public float maxAngle = 0;
 
-    /// <summary>
-    /// Returns the normal in the world space
-    /// </summary>
-    /// <returns>Normal in world space</returns>
-    public override Vector3 Normal()
+    private void ComputeMaxAngle(Vector3[] vertices)
     {
-        return transform.TransformDirection(LocalNormal);
+        Vector3 v = (vertices[1] - vertices[0]).normalized;
+        Vector3 u = (vertices[2] - vertices[0]).normalized;
+        Vector3 perp = Vector3.Cross(v, u).normalized;
+        for (int i = 3; i < vertices.Length-1; i++)
+        {
+            Vector3 w = vertices[i] - vertices[0];
+            //MathfVector3.Angle(perp, w);
+        }
     }
+
 }

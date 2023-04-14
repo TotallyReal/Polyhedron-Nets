@@ -9,10 +9,10 @@ using UnityEngine;
 using DirectedEdge = GraphStructure<Face, Axis>.DirectedEdge;
 
 public class FaceGraph : MonoBehaviour
-{
-
-    [SerializeField] private Face rootFace; // TODO change to private
+{    
     [SerializeField] private int numberOfFaces = 0;
+    private Face rootFace; // TODO change to private
+    // TODO : add list of edges
     public bool runButton = false;
 
     class FaceGraphStructure : GraphStructure<Face, Axis>
@@ -123,7 +123,7 @@ public class FaceGraph : MonoBehaviour
         {
             if (directedEdge.treeEdge)
             {
-                directedEdge.edge.StartRotating(directedEdge.parent);
+                directedEdge.edge.SetAngle(directedEdge.parent, 180);
             } else 
             {
                 directedEdge.edge.Disconnect();
@@ -213,5 +213,24 @@ public class FaceGraph : MonoBehaviour
         this.numberOfFaces = numberOfFaces;
     }
 
+    public bool CompareTo(FaceGraph other)
+    {
+        List<DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(rootFace);
+        List<DirectedEdge> otherDirectedEdges = dfsGraph.GetDirectedEdgesDFS(other.rootFace);
+
+        List<(int, int)> numberedEdges = (
+            from directedEdge in directedEdges
+            where !directedEdge.edge.IsSelected()
+            select directedEdge.edge.AsTuple()).ToList();
+        numberedEdges.Sort();
+
+        List<(int, int)> otherNumberedEdges = (
+            from directedEdge in otherDirectedEdges
+            where !directedEdge.edge.IsSelected()
+            select directedEdge.edge.AsTuple()).ToList();
+        otherNumberedEdges.Sort();
+
+        return numberedEdges.SequenceEqual(otherNumberedEdges);
+    }
 }
 

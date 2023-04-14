@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class ButtonsUI : MonoBehaviour
 {
-
-    [SerializeField] private FaceGraph faceGraph;
     [SerializeField] private Button unfoldButton;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button compareButton;
@@ -14,8 +12,9 @@ public class ButtonsUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        unfoldButton.onClick.AddListener(() => { faceGraph.CreateTransformGraph(); });
+        unfoldButton.onClick.AddListener(() => { VisualPolyhedronFactory.Instance.CreateTransformGraph(); });
         restartButton.onClick.AddListener(() => { VisualPolyhedronFactory.Instance.CreatePolyhedron(); });
+        compareButton.onClick.AddListener(() => { VisualPolyhedronFactory.Instance.CompareUnfolding(); });
     }
 
     // Update is called once per frame

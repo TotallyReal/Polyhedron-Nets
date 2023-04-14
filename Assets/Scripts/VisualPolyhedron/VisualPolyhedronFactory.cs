@@ -26,14 +26,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [Header("MISC")]
     [ContextMenuItem("Variable menu", "VariableAction")]
     [SerializeField] private RotatorArrow rotatorArrow;
-    [SerializeField] private bool touchMe;
-
-    private void OnValidate()
-    {
-        if (touchMe)
-        {
-        }
-    }
+    [SerializeField] private Transform floor;
 
     [ContextMenu("this is a context menu")]
     private void MenuAction()
@@ -69,13 +62,13 @@ public class VisualPolyhedronFactory : MonoBehaviour
             new Vector3Int(-1,0,0),
         }, new Vector3Int(0, -2, 0), new Vector3Int(0, -1, 0), 5);*/
         //AbstractPolyhedron abstractPolyhedron = AbstractPolyhedron.CreateCube(5);
-        AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Dodecahedron(10);
-        //AbstractPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Isocahedron(10); 
+        //AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Dodecahedron(10);
+        AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Isocahedron(10); 
 
         if (visualPolyhedron != null)
         {
             Destroy(visualPolyhedron.gameObject);
-            //Destroy(shadowVisualPolyhedron.gameObject);
+            Destroy(shadowVisualPolyhedron.gameObject);
         }
 
         visualPolyhedron = CreatePolyhedron(abstractPolyhedron).GetComponent<VisualPolyhedron>();
@@ -85,6 +78,13 @@ public class VisualPolyhedronFactory : MonoBehaviour
         shadowVisualPolyhedron = CreatePolyhedron(abstractPolyhedron).GetComponent<VisualPolyhedron>();
         shadowVisualPolyhedron.gameObject.name = "Shadow polyhedron";
         shadowVisualPolyhedron.SetFaceMaterial(rootMaterial);
+
+        FaceMesh shadowRoot = shadowVisualPolyhedron.RootFace;
+        
+        float dy = floor.position.y - shadowRoot.transform.TransformPoint(shadowRoot.Center).y;
+        dy += 0.5f;
+        shadowVisualPolyhedron.transform.position += new Vector3(0, dy, 0);
+
 
         FaceGraph faceGraph = shadowVisualPolyhedron.GetComponent<FaceGraph>();
         faceGraph.CreateRandomGraph();
@@ -116,7 +116,8 @@ public class VisualPolyhedronFactory : MonoBehaviour
     private FaceMesh CreateFace(
         VisualPolyhedron visualPolyhedron, Vector3[] faceVertices, int index, bool addNumbering = true)
     {
-        FaceMesh face = Instantiate<FaceMesh>(facePrefab, visualPolyhedron.transform);
+        FaceMesh face = Instantiate(facePrefab, visualPolyhedron.transform);
+        face.ID = index;
         face.name = $"Face {index}";
         face.CreateMesh(faceVertices);
 
@@ -260,6 +261,12 @@ public class VisualPolyhedronFactory : MonoBehaviour
     {
         FaceGraph faceGraph = visualPolyhedron.GetComponent<FaceGraph>();
         FaceGraph shadowFaceGraph = shadowVisualPolyhedron.GetComponent<FaceGraph>();
+        Debug.Log($"Graph comparison {faceGraph.CompareTo(shadowFaceGraph)}");
+    }
+
+    internal void CreateTransformGraph()
+    {
+        visualPolyhedron.GetComponent<FaceGraph>().CreateTransformGraph();
     }
 }
 

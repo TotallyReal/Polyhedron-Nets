@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+[SelectionBase]
 public class NumberedCanvas : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI text;
