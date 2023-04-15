@@ -49,6 +49,15 @@ public class VisualPolyhedronFactory : MonoBehaviour
     private void Start()
     {
         CreatePolyhedron();
+
+        PlayerInput input = new PlayerInput();
+        input.Player.Enable();
+        input.Player.Graph.performed += CreateGraph;
+    }
+    private void CreateGraph(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if (visualPolyhedron!=null)
+            visualPolyhedron.GetComponent<FaceGraph>().CreateTransformGraph();
     }
 
     public void CreatePolyhedron()
@@ -63,7 +72,8 @@ public class VisualPolyhedronFactory : MonoBehaviour
         }, new Vector3Int(0, -2, 0), new Vector3Int(0, -1, 0), 5);*/
         //AbstractPolyhedron abstractPolyhedron = AbstractPolyhedron.CreateCube(5);
         //AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Dodecahedron(10);
-        AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Isocahedron(10); 
+        AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Isocahedron(10);
+        //AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Cube(10);
 
         if (visualPolyhedron != null)
         {

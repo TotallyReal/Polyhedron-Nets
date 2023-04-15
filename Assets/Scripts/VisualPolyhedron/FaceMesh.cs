@@ -12,6 +12,11 @@ public class FaceMesh : Face
     public Vector3 LocalNormal { get; private set; }
     public Vector3 Center { get; private set; }
 
+    public override Vector3 GetGlobalCenter()
+    {
+        return transform.TransformPoint(Center);
+    }
+
     public void SetMaterial(Material material)
     {
         GetComponent<Renderer>().material = material;

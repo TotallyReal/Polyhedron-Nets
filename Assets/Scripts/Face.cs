@@ -11,4 +11,9 @@ public class Face : MonoBehaviour
     {
         return transform.up;
     }
+
+    virtual public Vector3 GetGlobalCenter()
+    {
+        return transform.position;
+    }
 }

@@ -9,18 +9,16 @@ public class Axis : MonoBehaviour
     [SerializeField] private Face face1;
     [SerializeField] private Face face2;
     [SerializeField] private Transform visual;
-    private Vector3 direction, worldDirection;
 
-    private Vector3 _direction, _worldDirection;
     private MouseTarget target;
-    private float angle;
     private float anglePerSecond = 125f;
 
-    private float scale = 1f;
+    private RotationAxis rotationAxis;
 
     void Awake()
     {
         target = GetComponentInChildren<MouseTarget>();
+        rotationAxis = GetComponent<RotationAxis>();
     }
 
     #region ------------------ faces ------------------
@@ -95,61 +93,29 @@ public class Axis : MonoBehaviour
 
     #region ------------------ rotating process ------------------
 
-    public void Update()
-    {
-        if (direction == null || angle == 0)
-            return;
-        //Debug.Log(angle);
-        float dAngle = Mathf.Min(Mathf.Abs(angle), anglePerSecond * Time.deltaTime);
-        if (angle > 0)
-        {
-            angle -= dAngle;
-            transform.Rotate(direction, dAngle, Space.Self);
-        }
-        if (angle < 0)
-        {
-            angle += dAngle;
-            transform.Rotate(direction, -dAngle, Space.Self);
-        }
-    }
-
-    /// <summary>
-    /// Computes the angle IN DEGREES(!!!) from face1 to face2.
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="Exception">In case the axis doesn't connect two faces</exception>
-    public float GetAngle()
-    {
-        if (face1 == null || face2 == null)
-            throw new Exception("Edge doesn't have two faces to compute the angles between them");
-
-        Vector3 v = face1.Normal();
-        Vector3 u = face2.Normal();
-
-        worldDirection = Vector3.Cross(v, u);
-        if (worldDirection.sqrMagnitude < 0.001f) 
-            // In case the vectors are almost the same, just assume that the angle is zero.
-            return 0;
-        direction = transform.InverseTransformDirection(worldDirection);
-        float angleBetweenNormals = Vector3.SignedAngle(v, u, worldDirection);
-        return 180 - angleBetweenNormals;
-    }
-
     /// <summary>
     /// Set angle in DEGREES. Rotate the non fixed face
     /// </summary>
     public void SetAngle(Face fixedFace, float angle)
     {
-        float rotationAngle = GetAngle();
-        if (fixedFace != face1)
-            rotationAngle *= -1;
-        transform.Rotate(direction, rotationAngle-angle, Space.Self);
+        Face otherFace = GetOtherFace(fixedFace);
+        float angleBetweenFaces = rotationAxis.GetAngle(fixedFace.GetGlobalCenter(), otherFace.GetGlobalCenter());
+        rotationAxis.RotateAround(otherFace.transform, angle - angleBetweenFaces);
     }
 
+    /// <summary>
+    /// Start a rotating animation of the other face (than the given one) so it 
+    /// would be eventually at 180 from the fixed face.
+    /// </summary>
+    /// <param name="fixedFace"></param>
     public void StartRotating(Face fixedFace)
     {
-        float rotationAngle = GetAngle();
-        this.angle = (fixedFace == face1) ? -rotationAngle : rotationAngle;  
+        Face otherFace = GetOtherFace(fixedFace);
+        float angleBetweenFaces = rotationAxis.GetAngle(otherFace.GetGlobalCenter(), fixedFace.GetGlobalCenter());
+        float angleToRotate = angleBetweenFaces - 180;
+        if (angleBetweenFaces < 0)
+            angleToRotate = angleBetweenFaces + 180;
+        rotationAxis.AddRotationProcess(otherFace.transform, angleToRotate, anglePerSecond);
     }
 
     #endregion
@@ -170,11 +136,11 @@ public class Axis : MonoBehaviour
     {
         transform.position = Vector3.Lerp(from, to, 0.5f);
         Vector3 dir = from - to;
-        _worldDirection = -dir.normalized;
         MathTools.RotateToMatch(transform, transform.up, dir);
-        scale = dir.magnitude / 2;
 
         visual.transform.localScale = new Vector3(0.5f, dir.magnitude / 2, 0.5f);
+
+        rotationAxis.SetAxis(from, to);
     }
 
     public void SetMaterial(Material material)

@@ -55,12 +55,6 @@ public class FaceGraph : MonoBehaviour
         dfsGraph = new FaceGraphStructure();
     }
 
-    private void Start()
-    {
-        PlayerInput input = new PlayerInput();
-        input.Player.Enable();
-        input.Player.Graph.performed += CreateGraph;
-    }
 
     private bool IsFullTree(IEnumerable<DirectedEdge> directedEdges)
     {
@@ -79,10 +73,6 @@ public class FaceGraph : MonoBehaviour
         }
     }
 
-    private void CreateGraph(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-        CreateTransformGraph();
-    }
 
     private IEnumerable<DirectedEdge> CreateInitialGraph()
     {
