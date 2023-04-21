@@ -6,14 +6,7 @@ using UnityEngine.UI;
 public class ChooseTexture : MonoBehaviour
 {
 
-    public static ChooseTexture Instance { get; private set; }
-    private VisualPolyhedron visualPolyhedron;
-
-
-    private void Awake()
-    {
-        Instance = this;
-    }
+    [SerializeField] private VisualPolyhedronFactory factory;
 
     [SerializeField] private List<Button> textureButtons;
     // Start is called before the first frame update
@@ -23,19 +16,12 @@ public class ChooseTexture : MonoBehaviour
         {
             button.onClick.AddListener(() => { ChooseMaterial(button.GetComponent<Image>().material); });
         }
-        
-
-    }
-
-    public void SetVisualPolyhedron(VisualPolyhedron visualPolyhedron)
-    {
-        this.visualPolyhedron = visualPolyhedron;
     }
 
     private void ChooseMaterial(Material material)
     {
         Debug.Log(material.ToString());
-        if (visualPolyhedron != null)
-            visualPolyhedron.SetFaceMaterial(material);
+        if (factory.GetVisualPolyhedron() != null)
+            factory.GetVisualPolyhedron().SetFaceMaterial(material);
     }
 }

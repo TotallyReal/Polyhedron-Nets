@@ -123,34 +123,9 @@ public class FaceGraph : MonoBehaviour
 
     public void CreateTransformGraph()
     {
-        /*Face root = rootFace;
-        if (root == null)
-            return;
-
-        // Run a DFS algorithm on the faces as nodes, where we start at the root and two faces are connected in the graph
-        // when there is an edge connecting them.
-        // The returned list of edges contains the information of whether the edge is part of a cycle or not.
-        List<DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(root);
-
-        // check if the graph is connected (tree edges = #nodes - 1)
-        if (!IsFullTree(directedEdges))
-        {
-            Debug.Log("The graph was disconnected");
-            return;
-        }
-
-        // Move all the faces to be children of the root face.
-        foreach (DirectedEdge directedEdge in directedEdges)
-        {
-            // Just to make sure that we don't accidently create loops
-            directedEdge.edge.transform.parent = root.transform;
-            if (directedEdge.child!= root && directedEdge.child!=null) 
-                directedEdge.child.transform.parent = root.transform;
-        }
-
-        SetParentFromDirectedEdges(directedEdges);*/
-
         IEnumerable<DirectedEdge> directedEdges = CreateInitialGraph();
+        if (directedEdges == null)
+            return;
 
         Dictionary<Face, int> componentOf = dfsGraph.GetStronglyConnectedComponents(rootFace);
         foreach (DirectedEdge directedEdge in directedEdges)
@@ -161,7 +136,10 @@ public class FaceGraph : MonoBehaviour
                 Face face1 = directedEdge.edge.GetFace1();
                 Face face2 = directedEdge.edge.GetFace2();
                 if (face1 == null || face2 == null || componentOf[face1] != componentOf[face2])
+                {
                     directedEdge.edge.Disconnect();
+                    directedEdge.edge.GetComponentInChildren<MouseTarget>().SetSelectable(false); // TODO : refactor this part
+                }
                 continue;
             }
             //if (directedEdge.child != null)

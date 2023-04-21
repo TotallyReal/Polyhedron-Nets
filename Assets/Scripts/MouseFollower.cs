@@ -8,7 +8,7 @@ public class MouseFollower : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (MouseSelector.Instance.MouseRaycast(out RaycastHit hit)){
+        /*if (MouseSelector.Instance.MouseRaycast(out RaycastHit hit)){
             transform.position = hit.point;
 
             VisualPolyhedron visualPolyhedron = VisualPolyhedronFactory.Instance.GetVisualPolyhedron();
@@ -20,6 +20,6 @@ public class MouseFollower : MonoBehaviour
             {
                 transform.localScale = new Vector3(1, 1, 1);
             }
-        }       
+        }     */  
     }
 }

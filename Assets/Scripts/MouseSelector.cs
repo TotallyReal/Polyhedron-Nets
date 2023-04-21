@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
+using Nets;
 
 /// <summary>
 /// Fires an OnObjectPressed event whenever the mouse presses an object (with collider).
@@ -13,7 +14,7 @@ public class MouseSelector : MonoBehaviour
 
     public static MouseSelector Instance { get; private set; }
 
-    private PlayerInput input;    
+    private Nets.PlayerInput input;    
     public event EventHandler<Transform> OnObjectPressed;
     
 
@@ -21,7 +22,7 @@ public class MouseSelector : MonoBehaviour
     {
         Instance = this;
 
-        input = new PlayerInput();
+        input = new Nets.PlayerInput();
         input.MouseSelection.Enable();
     }
 

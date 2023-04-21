@@ -147,4 +147,9 @@ public class Axis : MonoBehaviour
     {
         visual.GetComponent<Renderer>().material = material;
     }
+
+    public void SetVisible(bool visible)
+    {
+        visual.gameObject.SetActive(visible);
+    }
 }

@@ -78,21 +78,7 @@ public class CubicPolyhedron : AbstractPolyhedron
                     Vector3Int position = new Vector3Int(i, j, k);
                     TryAddFace(position, Vector3Int.right, Vector3Int.up, Vector3Int.forward);                    
                     TryAddFace(position, Vector3Int.up, Vector3Int.forward, Vector3Int.right);
-                    TryAddFace(position, Vector3Int.forward, Vector3Int.right, Vector3Int.up);
-                    /*bool current = cubePositionsHash.Contains(new Vector3Int(i, j, k));
-                    bool next = cubePositionsHash.Contains(new Vector3Int(i+1, j, k));
-                    if (current ^ next)
-                    {
-                        // Need to add a face. Check first if we already have the required vertices,
-                        // and if not, add them.
-                        AddFace(new int[] {
-                            TryAddVertex(new Vector3Int(2 * i + 1, 2 * j + 1, 2 * k + 1)),
-                            TryAddVertex(new Vector3Int(2 * i + 1, 2 * j - 1, 2 * k + 1)),
-                            TryAddVertex(new Vector3Int(2 * i + 1, 2 * j + 1, 2 * k - 1)),
-                            TryAddVertex(new Vector3Int(2 * i + 1, 2 * j - 1, 2 * k - 1))
-                        }, $"({i} ~ {i+1},{j},{k})");
-
-                    }*/
+                    TryAddFace(position, Vector3Int.forward, Vector3Int.right, Vector3Int.up);                    
                 }
             }
         }

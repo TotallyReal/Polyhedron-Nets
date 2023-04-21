@@ -11,6 +11,12 @@ public class MouseTarget : MonoBehaviour
     [SerializeField] private Material selectedMaterial;
 
     private bool selected = false;
+    private bool selectable = true;
+
+    public void SetSelectable(bool selectable)
+    {
+        this.selectable = selectable;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -26,6 +32,8 @@ public class MouseTarget : MonoBehaviour
 
     public void SelectTarget()
     {
+        if (!selectable)
+            return;
         selected = !selected;
         if (selected)
         {

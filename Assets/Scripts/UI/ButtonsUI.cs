@@ -8,13 +8,14 @@ public class ButtonsUI : MonoBehaviour
     [SerializeField] private Button unfoldButton;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button compareButton;
+    [SerializeField] private VisualPolyhedronFactory polyhedronFactory;
 
     // Start is called before the first frame update
     void Start()
     {
-        unfoldButton.onClick.AddListener(() => { VisualPolyhedronFactory.Instance.CreateTransformGraph(); });
-        restartButton.onClick.AddListener(() => { VisualPolyhedronFactory.Instance.CreatePolyhedron(); });
-        compareButton.onClick.AddListener(() => { VisualPolyhedronFactory.Instance.CompareUnfolding(); });
+        unfoldButton.onClick.AddListener(() => { polyhedronFactory.CreateTransformGraph(); });
+        restartButton.onClick.AddListener(() => { polyhedronFactory.CreatePolyhedron(); });
+        compareButton.onClick.AddListener(() => { polyhedronFactory.CompareUnfolding(); });
     }
 
     // Update is called once per frame

@@ -58,16 +58,17 @@ public class VisualPolyhedron : MonoBehaviour
         }
     }
 
-    private AbstractGroupPolyhedron absPolyhedron;
+    private AbstractPolyhedron absPolyhedron;
 
-    public void SetAbstractPolyhedron(AbstractGroupPolyhedron absPolyhedron)
+    public void SetAbstractPolyhedron(AbstractPolyhedron absPolyhedron)
     {
         this.absPolyhedron = absPolyhedron;
     }
 
     public bool NearRotationAxis(Vector3 v, float error)
     {
-        return absPolyhedron.NearRotationAxis(v, error);
+        //return absPolyhedron.NearRotationAxis(v, error);
+        return false;
     }
 
     public IEnumerable<FaceMesh> GetFaces()

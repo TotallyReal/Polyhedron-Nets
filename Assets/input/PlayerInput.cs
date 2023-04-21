@@ -6,12 +6,14 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-public class @PlayerInput : IInputActionCollection, IDisposable
+namespace Nets
 {
-    public InputActionAsset asset { get; }
-    public @PlayerInput()
+    public class @PlayerInput : IInputActionCollection, IDisposable
     {
-        asset = InputActionAsset.FromJson(@"{
+        public InputActionAsset asset { get; }
+        public @PlayerInput()
+        {
+            asset = InputActionAsset.FromJson(@"{
     ""name"": ""PlayerInput"",
     ""maps"": [
         {
@@ -276,199 +278,200 @@ public class @PlayerInput : IInputActionCollection, IDisposable
     ],
     ""controlSchemes"": []
 }");
+            // MouseSelection
+            m_MouseSelection = asset.FindActionMap("MouseSelection", throwIfNotFound: true);
+            m_MouseSelection_EdgeSelect = m_MouseSelection.FindAction("EdgeSelect", throwIfNotFound: true);
+            // Camera
+            m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
+            m_Camera_Movement = m_Camera.FindAction("Movement", throwIfNotFound: true);
+            m_Camera_Zoom = m_Camera.FindAction("Zoom", throwIfNotFound: true);
+            m_Camera_mousezoom = m_Camera.FindAction("mouse zoom", throwIfNotFound: true);
+            m_Camera_AutoRotate = m_Camera.FindAction("Auto Rotate", throwIfNotFound: true);
+            // Player
+            m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
+            m_Player_Graph = m_Player.FindAction("Graph", throwIfNotFound: true);
+        }
+
+        public void Dispose()
+        {
+            UnityEngine.Object.Destroy(asset);
+        }
+
+        public InputBinding? bindingMask
+        {
+            get => asset.bindingMask;
+            set => asset.bindingMask = value;
+        }
+
+        public ReadOnlyArray<InputDevice>? devices
+        {
+            get => asset.devices;
+            set => asset.devices = value;
+        }
+
+        public ReadOnlyArray<InputControlScheme> controlSchemes => asset.controlSchemes;
+
+        public bool Contains(InputAction action)
+        {
+            return asset.Contains(action);
+        }
+
+        public IEnumerator<InputAction> GetEnumerator()
+        {
+            return asset.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public void Enable()
+        {
+            asset.Enable();
+        }
+
+        public void Disable()
+        {
+            asset.Disable();
+        }
+
         // MouseSelection
-        m_MouseSelection = asset.FindActionMap("MouseSelection", throwIfNotFound: true);
-        m_MouseSelection_EdgeSelect = m_MouseSelection.FindAction("EdgeSelect", throwIfNotFound: true);
+        private readonly InputActionMap m_MouseSelection;
+        private IMouseSelectionActions m_MouseSelectionActionsCallbackInterface;
+        private readonly InputAction m_MouseSelection_EdgeSelect;
+        public struct MouseSelectionActions
+        {
+            private @PlayerInput m_Wrapper;
+            public MouseSelectionActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+            public InputAction @EdgeSelect => m_Wrapper.m_MouseSelection_EdgeSelect;
+            public InputActionMap Get() { return m_Wrapper.m_MouseSelection; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(MouseSelectionActions set) { return set.Get(); }
+            public void SetCallbacks(IMouseSelectionActions instance)
+            {
+                if (m_Wrapper.m_MouseSelectionActionsCallbackInterface != null)
+                {
+                    @EdgeSelect.started -= m_Wrapper.m_MouseSelectionActionsCallbackInterface.OnEdgeSelect;
+                    @EdgeSelect.performed -= m_Wrapper.m_MouseSelectionActionsCallbackInterface.OnEdgeSelect;
+                    @EdgeSelect.canceled -= m_Wrapper.m_MouseSelectionActionsCallbackInterface.OnEdgeSelect;
+                }
+                m_Wrapper.m_MouseSelectionActionsCallbackInterface = instance;
+                if (instance != null)
+                {
+                    @EdgeSelect.started += instance.OnEdgeSelect;
+                    @EdgeSelect.performed += instance.OnEdgeSelect;
+                    @EdgeSelect.canceled += instance.OnEdgeSelect;
+                }
+            }
+        }
+        public MouseSelectionActions @MouseSelection => new MouseSelectionActions(this);
+
         // Camera
-        m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
-        m_Camera_Movement = m_Camera.FindAction("Movement", throwIfNotFound: true);
-        m_Camera_Zoom = m_Camera.FindAction("Zoom", throwIfNotFound: true);
-        m_Camera_mousezoom = m_Camera.FindAction("mouse zoom", throwIfNotFound: true);
-        m_Camera_AutoRotate = m_Camera.FindAction("Auto Rotate", throwIfNotFound: true);
+        private readonly InputActionMap m_Camera;
+        private ICameraActions m_CameraActionsCallbackInterface;
+        private readonly InputAction m_Camera_Movement;
+        private readonly InputAction m_Camera_Zoom;
+        private readonly InputAction m_Camera_mousezoom;
+        private readonly InputAction m_Camera_AutoRotate;
+        public struct CameraActions
+        {
+            private @PlayerInput m_Wrapper;
+            public CameraActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+            public InputAction @Movement => m_Wrapper.m_Camera_Movement;
+            public InputAction @Zoom => m_Wrapper.m_Camera_Zoom;
+            public InputAction @mousezoom => m_Wrapper.m_Camera_mousezoom;
+            public InputAction @AutoRotate => m_Wrapper.m_Camera_AutoRotate;
+            public InputActionMap Get() { return m_Wrapper.m_Camera; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(CameraActions set) { return set.Get(); }
+            public void SetCallbacks(ICameraActions instance)
+            {
+                if (m_Wrapper.m_CameraActionsCallbackInterface != null)
+                {
+                    @Movement.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnMovement;
+                    @Movement.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnMovement;
+                    @Movement.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnMovement;
+                    @Zoom.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnZoom;
+                    @Zoom.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnZoom;
+                    @Zoom.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnZoom;
+                    @mousezoom.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnMousezoom;
+                    @mousezoom.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnMousezoom;
+                    @mousezoom.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnMousezoom;
+                    @AutoRotate.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnAutoRotate;
+                    @AutoRotate.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnAutoRotate;
+                    @AutoRotate.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnAutoRotate;
+                }
+                m_Wrapper.m_CameraActionsCallbackInterface = instance;
+                if (instance != null)
+                {
+                    @Movement.started += instance.OnMovement;
+                    @Movement.performed += instance.OnMovement;
+                    @Movement.canceled += instance.OnMovement;
+                    @Zoom.started += instance.OnZoom;
+                    @Zoom.performed += instance.OnZoom;
+                    @Zoom.canceled += instance.OnZoom;
+                    @mousezoom.started += instance.OnMousezoom;
+                    @mousezoom.performed += instance.OnMousezoom;
+                    @mousezoom.canceled += instance.OnMousezoom;
+                    @AutoRotate.started += instance.OnAutoRotate;
+                    @AutoRotate.performed += instance.OnAutoRotate;
+                    @AutoRotate.canceled += instance.OnAutoRotate;
+                }
+            }
+        }
+        public CameraActions @Camera => new CameraActions(this);
+
         // Player
-        m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
-        m_Player_Graph = m_Player.FindAction("Graph", throwIfNotFound: true);
-    }
-
-    public void Dispose()
-    {
-        UnityEngine.Object.Destroy(asset);
-    }
-
-    public InputBinding? bindingMask
-    {
-        get => asset.bindingMask;
-        set => asset.bindingMask = value;
-    }
-
-    public ReadOnlyArray<InputDevice>? devices
-    {
-        get => asset.devices;
-        set => asset.devices = value;
-    }
-
-    public ReadOnlyArray<InputControlScheme> controlSchemes => asset.controlSchemes;
-
-    public bool Contains(InputAction action)
-    {
-        return asset.Contains(action);
-    }
-
-    public IEnumerator<InputAction> GetEnumerator()
-    {
-        return asset.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
-    public void Enable()
-    {
-        asset.Enable();
-    }
-
-    public void Disable()
-    {
-        asset.Disable();
-    }
-
-    // MouseSelection
-    private readonly InputActionMap m_MouseSelection;
-    private IMouseSelectionActions m_MouseSelectionActionsCallbackInterface;
-    private readonly InputAction m_MouseSelection_EdgeSelect;
-    public struct MouseSelectionActions
-    {
-        private @PlayerInput m_Wrapper;
-        public MouseSelectionActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
-        public InputAction @EdgeSelect => m_Wrapper.m_MouseSelection_EdgeSelect;
-        public InputActionMap Get() { return m_Wrapper.m_MouseSelection; }
-        public void Enable() { Get().Enable(); }
-        public void Disable() { Get().Disable(); }
-        public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(MouseSelectionActions set) { return set.Get(); }
-        public void SetCallbacks(IMouseSelectionActions instance)
+        private readonly InputActionMap m_Player;
+        private IPlayerActions m_PlayerActionsCallbackInterface;
+        private readonly InputAction m_Player_Graph;
+        public struct PlayerActions
         {
-            if (m_Wrapper.m_MouseSelectionActionsCallbackInterface != null)
+            private @PlayerInput m_Wrapper;
+            public PlayerActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+            public InputAction @Graph => m_Wrapper.m_Player_Graph;
+            public InputActionMap Get() { return m_Wrapper.m_Player; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
+            public void SetCallbacks(IPlayerActions instance)
             {
-                @EdgeSelect.started -= m_Wrapper.m_MouseSelectionActionsCallbackInterface.OnEdgeSelect;
-                @EdgeSelect.performed -= m_Wrapper.m_MouseSelectionActionsCallbackInterface.OnEdgeSelect;
-                @EdgeSelect.canceled -= m_Wrapper.m_MouseSelectionActionsCallbackInterface.OnEdgeSelect;
-            }
-            m_Wrapper.m_MouseSelectionActionsCallbackInterface = instance;
-            if (instance != null)
-            {
-                @EdgeSelect.started += instance.OnEdgeSelect;
-                @EdgeSelect.performed += instance.OnEdgeSelect;
-                @EdgeSelect.canceled += instance.OnEdgeSelect;
+                if (m_Wrapper.m_PlayerActionsCallbackInterface != null)
+                {
+                    @Graph.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGraph;
+                    @Graph.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGraph;
+                    @Graph.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGraph;
+                }
+                m_Wrapper.m_PlayerActionsCallbackInterface = instance;
+                if (instance != null)
+                {
+                    @Graph.started += instance.OnGraph;
+                    @Graph.performed += instance.OnGraph;
+                    @Graph.canceled += instance.OnGraph;
+                }
             }
         }
-    }
-    public MouseSelectionActions @MouseSelection => new MouseSelectionActions(this);
-
-    // Camera
-    private readonly InputActionMap m_Camera;
-    private ICameraActions m_CameraActionsCallbackInterface;
-    private readonly InputAction m_Camera_Movement;
-    private readonly InputAction m_Camera_Zoom;
-    private readonly InputAction m_Camera_mousezoom;
-    private readonly InputAction m_Camera_AutoRotate;
-    public struct CameraActions
-    {
-        private @PlayerInput m_Wrapper;
-        public CameraActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Movement => m_Wrapper.m_Camera_Movement;
-        public InputAction @Zoom => m_Wrapper.m_Camera_Zoom;
-        public InputAction @mousezoom => m_Wrapper.m_Camera_mousezoom;
-        public InputAction @AutoRotate => m_Wrapper.m_Camera_AutoRotate;
-        public InputActionMap Get() { return m_Wrapper.m_Camera; }
-        public void Enable() { Get().Enable(); }
-        public void Disable() { Get().Disable(); }
-        public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(CameraActions set) { return set.Get(); }
-        public void SetCallbacks(ICameraActions instance)
+        public PlayerActions @Player => new PlayerActions(this);
+        public interface IMouseSelectionActions
         {
-            if (m_Wrapper.m_CameraActionsCallbackInterface != null)
-            {
-                @Movement.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnMovement;
-                @Movement.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnMovement;
-                @Movement.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnMovement;
-                @Zoom.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnZoom;
-                @Zoom.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnZoom;
-                @Zoom.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnZoom;
-                @mousezoom.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnMousezoom;
-                @mousezoom.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnMousezoom;
-                @mousezoom.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnMousezoom;
-                @AutoRotate.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnAutoRotate;
-                @AutoRotate.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnAutoRotate;
-                @AutoRotate.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnAutoRotate;
-            }
-            m_Wrapper.m_CameraActionsCallbackInterface = instance;
-            if (instance != null)
-            {
-                @Movement.started += instance.OnMovement;
-                @Movement.performed += instance.OnMovement;
-                @Movement.canceled += instance.OnMovement;
-                @Zoom.started += instance.OnZoom;
-                @Zoom.performed += instance.OnZoom;
-                @Zoom.canceled += instance.OnZoom;
-                @mousezoom.started += instance.OnMousezoom;
-                @mousezoom.performed += instance.OnMousezoom;
-                @mousezoom.canceled += instance.OnMousezoom;
-                @AutoRotate.started += instance.OnAutoRotate;
-                @AutoRotate.performed += instance.OnAutoRotate;
-                @AutoRotate.canceled += instance.OnAutoRotate;
-            }
+            void OnEdgeSelect(InputAction.CallbackContext context);
         }
-    }
-    public CameraActions @Camera => new CameraActions(this);
-
-    // Player
-    private readonly InputActionMap m_Player;
-    private IPlayerActions m_PlayerActionsCallbackInterface;
-    private readonly InputAction m_Player_Graph;
-    public struct PlayerActions
-    {
-        private @PlayerInput m_Wrapper;
-        public PlayerActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Graph => m_Wrapper.m_Player_Graph;
-        public InputActionMap Get() { return m_Wrapper.m_Player; }
-        public void Enable() { Get().Enable(); }
-        public void Disable() { Get().Disable(); }
-        public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
-        public void SetCallbacks(IPlayerActions instance)
+        public interface ICameraActions
         {
-            if (m_Wrapper.m_PlayerActionsCallbackInterface != null)
-            {
-                @Graph.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGraph;
-                @Graph.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGraph;
-                @Graph.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnGraph;
-            }
-            m_Wrapper.m_PlayerActionsCallbackInterface = instance;
-            if (instance != null)
-            {
-                @Graph.started += instance.OnGraph;
-                @Graph.performed += instance.OnGraph;
-                @Graph.canceled += instance.OnGraph;
-            }
+            void OnMovement(InputAction.CallbackContext context);
+            void OnZoom(InputAction.CallbackContext context);
+            void OnMousezoom(InputAction.CallbackContext context);
+            void OnAutoRotate(InputAction.CallbackContext context);
         }
-    }
-    public PlayerActions @Player => new PlayerActions(this);
-    public interface IMouseSelectionActions
-    {
-        void OnEdgeSelect(InputAction.CallbackContext context);
-    }
-    public interface ICameraActions
-    {
-        void OnMovement(InputAction.CallbackContext context);
-        void OnZoom(InputAction.CallbackContext context);
-        void OnMousezoom(InputAction.CallbackContext context);
-        void OnAutoRotate(InputAction.CallbackContext context);
-    }
-    public interface IPlayerActions
-    {
-        void OnGraph(InputAction.CallbackContext context);
+        public interface IPlayerActions
+        {
+            void OnGraph(InputAction.CallbackContext context);
+        }
     }
 }

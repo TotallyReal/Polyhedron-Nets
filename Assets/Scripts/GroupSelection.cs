@@ -28,7 +28,7 @@ public class GroupSelection : MonoBehaviour
 
     private void Start()
     {
-        MouseSelector.Instance.OnObjectPressed += OnObjectPressed;
+        RaycastSelector.Instance.OnObjectPressed += OnObjectPressed;
     }
 
 
