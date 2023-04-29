@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using Nets;
 //using UnityEngine.ProBuilder;
 
 /// <summary>
@@ -13,69 +12,52 @@ public class VisualPolyhedronFactory : MonoBehaviour
 {
     //public static VisualPolyhedronFactory Instance { get; private set; } // TODO should I keep this static variable?
 
+    public enum PolyhedronShape
+    {
+        CUBE,
+        CUBE_COLLECTION,
+        DODECAHEDRON,
+        ISOCAHEDRON
+    }
+
     [Header("Polyhedron components")]
     [SerializeField] private string polyhedronName;
-    [Space(10)]
+    [SerializeField] private VisualPolyhedron VisualPolyhedronPrefab;
+    [SerializeField] private PolyhedronShape defaultShape = PolyhedronShape.CUBE;
+    [Header("Faces")]
     [SerializeField] private FaceMesh facePrefab;
+    [SerializeField] private float faceRadius = 5;
     [SerializeField] private Material faceMaterial;
     [SerializeField] private Material rootMaterial;
-    [Space(10)]
-    [SerializeField] private bool showEdges = true;
+    [Header("Edges")]
     [SerializeField] private Axis axisPrefab;
+    [SerializeField] private float edgeRadius = 0.5f;
+    [SerializeField] private bool showEdges = true;
     [SerializeField] private Material edgeMaterial;
-    [Space(10)]
-    [SerializeField] private bool numberedFaces = false;
-    [SerializeField] private float numberLabelDistance = 0.003f;
+    [Header("Numbers")]
     [SerializeField] private NumberedCanvas numberedCanvasPrefab;
-    [Space(10)]
-    [SerializeField] private bool randomOpen = false;
-
+    [SerializeField] private float numberRadius = 2;
+    [SerializeField] private bool showNumbers = false;
+    [SerializeField] private float numberLabelDistance = 0.003f;
     [Header("Polyhedron position")]
     [SerializeField] private Transform positionTransform;
-    enum PolyhedronPosition {
+    enum PolyhedronPosition
+    {
         CENTERED,
         ROOT
     }
+
     [SerializeField] private PolyhedronPosition polyhedronPosition;
-
     [Header("MISC")]
-    [ContextMenuItem("Variable menu", "VariableAction")]
-    [SerializeField] private RotatorArrow rotatorArrow;
-    [SerializeField] private Transform floor;
-
-    [ContextMenu("this is a context menu")]
-    private void MenuAction()
-    {
-        Debug.Log("Context menu");
-    }
-    private void VariableAction()
-    {
-        Debug.Log("Variable menu");
-    }
+    [SerializeField] private bool randomOpen = false;
 
     private VisualPolyhedron visualPolyhedron = null;
-
-    private void Awake()
-    {
-        
-    }
 
     private void Start()
     {
         CreatePolyhedron();
-
-        Nets.PlayerInput input = new Nets.PlayerInput();
-        input.Player.Enable();
-        input.Player.Graph.performed += CreateGraph;
     }
 
-    private void CreateGraph(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-        if (visualPolyhedron!=null)
-            visualPolyhedron.GetComponent<FaceGraph>().CreateTransformGraph();
-    }
-
-    [SerializeField] private float cubeRadius = 5;
     private List<Vector3Int> cubePositions = new List<Vector3Int>(){
             new Vector3Int(0,-1,0),
             new Vector3Int(0,0,0),
@@ -86,34 +68,67 @@ public class VisualPolyhedronFactory : MonoBehaviour
 
     public void AddCube(FaceMesh face)
     {
-        Vector3Int existingPosition = Vector3Int.CeilToInt((-face.Normal() + face.GetGlobalCenter() / cubeRadius) / 2);
+        Vector3Int existingPosition = Vector3Int.CeilToInt((-face.Normal() + face.GetGlobalCenter() / faceRadius) / 2);
         if (!cubePositions.Contains(existingPosition))
             return;
-        Vector3Int position = Vector3Int.CeilToInt((face.Normal() + face.GetGlobalCenter() / cubeRadius) / 2);
+        Vector3Int position = Vector3Int.CeilToInt((face.Normal() + face.GetGlobalCenter() / faceRadius) / 2);
         cubePositions.Add(Vector3Int.CeilToInt(position));
         // TODO : what happens when adding cubes on the root face?
         CreatePolyhedron();
     }
 
+    private AbstractPolyhedron GetDefaultPolyhedron()
+    {
+        switch (defaultShape)
+        {
+            case PolyhedronShape.CUBE:
+                return AbstractGroupPolyhedron.Cube(faceRadius);
+            case PolyhedronShape.DODECAHEDRON:
+                return AbstractGroupPolyhedron.Dodecahedron(faceRadius);                
+            case PolyhedronShape.ISOCAHEDRON:
+                return AbstractGroupPolyhedron.Isocahedron(faceRadius);
+            case PolyhedronShape.CUBE_COLLECTION:
+                return new CubicPolyhedron(
+                    cubePositions.ToArray(),
+                    new Vector3Int(0, -2, 0), new Vector3Int(0, -1, 0), faceRadius);
+            default:
+                return AbstractGroupPolyhedron.Cube(faceRadius);
+
+        }
+    }
+
+    private void SetDefaultFaceGraph(VisualPolyhedron visualPolyhedron)
+    {
+        foreach (Axis edge in visualPolyhedron.GetEdges())
+        {
+            (int, int) value = edge.AsTuple();
+            if (value.Item1 == 0 || value.Item2 == 0 || value.Item1 == 11 || value.Item2 == 11)
+                continue;
+            if (value.Item1 == 1 && value.Item2 == 7)
+                continue;
+            MouseTarget mouseTarget = edge.GetMouseTarget();
+            if (mouseTarget == null)
+            {
+                Debug.LogError("shouldn't be here");
+            }
+            else
+                mouseTarget.SelectTarget();
+        }
+    }
+
     public void CreatePolyhedron()
     {
-
-        /*AbstractPolyhedron abstractPolyhedron = new CubicPolyhedron(
-            cubePositions.ToArray(), 
-            new Vector3Int(0, -2, 0), new Vector3Int(0, -1, 0), cubeRadius);*/
-        //AbstractPolyhedron abstractPolyhedron = AbstractPolyhedron.CreateCube(5);
-        AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Dodecahedron(10);
-        //AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Isocahedron(10);
-        //AbstractGroupPolyhedron abstractPolyhedron = AbstractGroupPolyhedron.Cube(10);
-
         if (visualPolyhedron != null)
         {
             Destroy(visualPolyhedron.gameObject);
         }
 
+        AbstractPolyhedron abstractPolyhedron = GetDefaultPolyhedron();
         visualPolyhedron = CreatePolyhedron(abstractPolyhedron).GetComponent<VisualPolyhedron>();
         visualPolyhedron.gameObject.name = polyhedronName != null ? polyhedronName : "Polyhedron";
-        if (positionTransform != null) // position the polyhedron
+
+        // position the polyhedron
+        if (positionTransform != null) 
         {
             if (polyhedronPosition == PolyhedronPosition.CENTERED)
             {
@@ -125,9 +140,11 @@ public class VisualPolyhedronFactory : MonoBehaviour
                 Vector3 rootPosition = rootFace.transform.TransformPoint(rootFace.Center);
 
                 visualPolyhedron.transform.position +=
-                    (positionTransform.position - rootPosition) + new Vector3(0, 0.5f, 0);
+                    (positionTransform.position - rootPosition);
             }
         }
+
+        //SetDefaultFaceGraph(visualPolyhedron);
 
         if (randomOpen)
         {
@@ -170,13 +187,17 @@ public class VisualPolyhedronFactory : MonoBehaviour
         if (addNumbering)
         {
             NumberedCanvas numberedCanvas1 = Instantiate<NumberedCanvas>(numberedCanvasPrefab, face.transform);
-            numberedCanvas1.transform.position = face.Center + numberLabelDistance * face.LocalNormal.normalized;
-            numberedCanvas1.transform.forward = -face.LocalNormal;
+            numberedCanvas1.SetPosition(
+                center: face.Center + numberLabelDistance * face.LocalNormal.normalized,
+                direction: -face.LocalNormal);
+            numberedCanvas1.SetRadius(numberRadius);
             numberedCanvas1.SetNumber(index);
 
             NumberedCanvas numberedCanvas2 = Instantiate<NumberedCanvas>(numberedCanvasPrefab, face.transform);
-            numberedCanvas2.transform.position = face.Center - numberLabelDistance * face.LocalNormal.normalized;
-            numberedCanvas2.transform.forward = face.LocalNormal;
+            numberedCanvas2.SetPosition(
+                center: face.Center - numberLabelDistance * face.LocalNormal.normalized,
+                direction: face.LocalNormal);
+            numberedCanvas2.SetRadius(numberRadius);
             numberedCanvas2.SetNumber(index);
         }
 
@@ -198,7 +219,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
             {
                 // edge does not exist - create it
                 edge = Instantiate<Axis>(axisPrefab, visualPolyhedron.transform);
-                edge.SetVisual(v1, v2);
+                edge.SetVisual(v1, v2, edgeRadius);
 
                 edgesDict.Add((index1, index2), edge);
 
@@ -212,8 +233,6 @@ public class VisualPolyhedronFactory : MonoBehaviour
         int faceIndex = 0;
 
         Vector3[] vertices = absPolyhedron.GetVertices();
-        //Vector3 rotationAxis = Vector3.up;
-        //float rotationAngle = 0;
 
         // Create the faces
         foreach (var abstractFace in absPolyhedron.GetAbstractFaces())
@@ -228,7 +247,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
             }
 
             // Create the face's GameObject
-            FaceMesh face = CreateFace(visualPolyhedron, faceVertices, faceIndex++, numberedFaces);
+            FaceMesh face = CreateFace(visualPolyhedron, faceVertices, faceIndex++, showNumbers);
             visualPolyhedron.AddFace(face);
             if (visualPolyhedron.RootFace == null)
             {
@@ -279,9 +298,13 @@ public class VisualPolyhedronFactory : MonoBehaviour
     public GameObject CreatePolyhedron(AbstractPolyhedron absPolyhedron)
     {
         // ------------------- create polyhedron object -------------------
-        GameObject polyhedron = new GameObject();
 
-        VisualPolyhedron visualPolyhedron = polyhedron.AddComponent<VisualPolyhedron>();
+
+
+        //GameObject polyhedron = new GameObject();
+
+        VisualPolyhedron visualPolyhedron = Instantiate<VisualPolyhedron>(VisualPolyhedronPrefab);
+        //VisualPolyhedron visualPolyhedron = polyhedron.AddComponent<VisualPolyhedron>();
         CreateFacesAndEdges(absPolyhedron, visualPolyhedron);
         RotatePolyhedron(visualPolyhedron);  // so that the root face will face downwards
 
@@ -289,14 +312,15 @@ public class VisualPolyhedronFactory : MonoBehaviour
         visualPolyhedron.SetEdgeMaterial(edgeMaterial);
 
         // ------------------- face graph -------------------
-        FaceGraph graph = polyhedron.AddComponent<FaceGraph>();
+        FaceGraph graph = visualPolyhedron.GetFaceGraph();
+        //FaceGraph graph = polyhedron.AddComponent<FaceGraph>();
         graph.SetPolyhedron(visualPolyhedron.RootFace, absPolyhedron.GetFaces().Count);
         visualPolyhedron.RootFace.SetMaterial(rootMaterial);
 
         // ------------------- rotator arrow -------------------
         //rotatorArrow.SetObjectToRotate(polyhedron.transform); // TODO: remove 
 
-        return polyhedron;
+        return visualPolyhedron.gameObject;
     }
 
     public VisualPolyhedron GetVisualPolyhedron()

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-namespace Nets
+namespace NetsOld
 {
     public class @PlayerInput : IInputActionCollection, IDisposable
     {

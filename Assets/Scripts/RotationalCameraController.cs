@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.InputSystem;
 using System;
-using Nets;
 
 /// <summary>
 /// Use to control the camera position using polar coordinates
@@ -83,11 +82,11 @@ public class RotationalCameraController : MonoBehaviour
 
     #region -------------------------- Input --------------------------
 
-    private Nets.PlayerInput input;
+    private NetsPlayerInput input;
 
     private void StartInput()
     {
-        input = new Nets.PlayerInput();
+        input = new NetsPlayerInput();
         input.Camera.Enable();
         input.Camera.AutoRotate.performed += AutoRotate_performed;
     }

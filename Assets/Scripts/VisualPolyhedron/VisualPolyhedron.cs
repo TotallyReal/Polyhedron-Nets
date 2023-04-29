@@ -12,11 +12,14 @@ public class VisualPolyhedron : MonoBehaviour
     private List<Axis> edges;
     private List<FaceMesh> faces;
     public FaceMesh RootFace { get; set; }
+    private FaceGraph faceGraph;
 
     private void Awake()
     {
         edges = new List<Axis>();
         faces = new List<FaceMesh>();
+
+        faceGraph = GetComponent<FaceGraph>();
     }
 
     private void OnValidate()
@@ -31,10 +34,19 @@ public class VisualPolyhedron : MonoBehaviour
         }
     }
 
-    public void AddEdge(Axis axis) {
-        edges.Add(axis);
+    private AbstractPolyhedron absPolyhedron;
+
+    public void SetAbstractPolyhedron(AbstractPolyhedron absPolyhedron)
+    {
+        this.absPolyhedron = absPolyhedron;
     }
 
+    public FaceGraph GetFaceGraph()
+    {
+        return faceGraph;
+    }
+
+    #region --------------------- faces ---------------------
     public void AddFace(FaceMesh face)
     {
         faces.Add(face);
@@ -49,6 +61,19 @@ public class VisualPolyhedron : MonoBehaviour
         }
     }
 
+    public IEnumerable<FaceMesh> GetFaces()
+    {
+        return faces;
+    }
+
+    #endregion
+
+    #region --------------------- edges ---------------------
+    public void AddEdge(Axis axis)
+    {
+        edges.Add(axis);
+    }
+
     public void SetEdgeMaterial(Material edgeMaterial)
     {
         this.edgeMaterial = edgeMaterial;
@@ -58,25 +83,15 @@ public class VisualPolyhedron : MonoBehaviour
         }
     }
 
-    private AbstractPolyhedron absPolyhedron;
-
-    public void SetAbstractPolyhedron(AbstractPolyhedron absPolyhedron)
+    public IEnumerable<Axis> GetEdges()
     {
-        this.absPolyhedron = absPolyhedron;
+        return edges;
     }
 
+    #endregion
     public bool NearRotationAxis(Vector3 v, float error)
     {
         //return absPolyhedron.NearRotationAxis(v, error);
         return false;
-    }
-
-    public IEnumerable<FaceMesh> GetFaces()
-    {
-        return faces;
-    }
-    public IEnumerable<Axis> GetEdges()
-    {
-        return edges;
     }
 }

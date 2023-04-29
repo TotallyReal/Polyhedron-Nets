@@ -8,14 +8,17 @@ public class RaycastSelector : MonoBehaviour
 {
     public static RaycastSelector Instance { get; private set; }
 
-    private Nets.PlayerInput input;
+    [SerializeField] private bool mouseLogs = true;
+
+    private NetsPlayerInput input;
 
 
     void Awake()
     {
         Instance = this;
 
-        input = new Nets.PlayerInput();
+        mousePosition = DefaultMousePosition;
+        input = new NetsPlayerInput();
         input.MouseSelection.Enable();
     }
 
@@ -32,6 +35,8 @@ public class RaycastSelector : MonoBehaviour
     #region --------------- mouse raycast ---------------
 
     [SerializeField] private bool mouseRaycastActive = false;
+    public delegate Vector2 MousePosition();
+    private MousePosition mousePosition;
 
     public void SetMouseRaycastActive(bool active)
     {
@@ -45,31 +50,36 @@ public class RaycastSelector : MonoBehaviour
     public event EventHandler<Transform> OnObjectPressed;
 
     /// <summary>
-    /// Return the position of the mouse on screen.
+    /// Return the position of the mouse on screen, used for raycasting.
     /// </summary>
     /// <returns></returns>
-    private Vector2 MousePosition()
+    private Vector2 DefaultMousePosition()
     {
         return Mouse.current.position.ReadValue();
+    }
+
+    public void ChangeMousePositionForRaycasts(MousePosition mousePosition)
+    {
+        this.mousePosition = (mousePosition != null) ? mousePosition : DefaultMousePosition;
     }
 
     private void MousePressed(InputAction.CallbackContext obj)
     {
         if (!mouseRaycastActive)
             return;
-        if (ScreenRaycastObject(MousePosition(), out Transform mouseObject))
+        if (ScreenRaycastObject(mousePosition(), out Transform mouseObject))
         {
-            Debug.Log($"{mouseObject.gameObject.name} pressed");
+            if (mouseLogs)
+                Debug.Log($"{mouseObject.gameObject.name} pressed");
             OnObjectPressed?.Invoke(this, mouseObject);
         }
     }
 
     #endregion
 
+    #region --------------- (static) screen raycast ---------------
 
-    #region --------------- screen raycast ---------------
-
-    public bool ScreenRaycast(Vector2 screenPoint, out RaycastHit hit)
+    public static bool ScreenRaycast(Vector2 screenPoint, out RaycastHit hit)
     {
         Ray ray = Camera.main.ScreenPointToRay(screenPoint);
         return Physics.Raycast(ray, out hit);
@@ -81,12 +91,11 @@ public class RaycastSelector : MonoBehaviour
     /// </summary>
     /// <param name="objectTransform">The possible object at the screenPoint position</param>
     /// <returns>A bool showing if there is an objected pointed at</returns>
-    public bool ScreenRaycastObject(Vector2 screenPoint, out Transform objectTransform)
+    public static bool ScreenRaycastObject(Vector2 screenPoint, out Transform objectTransform)
     {
         objectTransform = null;
 
-        Ray ray = Camera.main.ScreenPointToRay(screenPoint);
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        if (ScreenRaycast(screenPoint, out RaycastHit hit))
         {
             objectTransform = hit.transform;
             return true;
@@ -94,12 +103,11 @@ public class RaycastSelector : MonoBehaviour
         return false;
     }
 
-    public bool ScreenRaycastOfType<T>(Vector2 screenPoint, out T raycaseObject)
+    public static bool ScreenRaycastOfType<T>(Vector2 screenPoint, out T raycaseObject)
     {
-        Ray ray = Camera.main.ScreenPointToRay(screenPoint);
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        if (ScreenRaycastObject(screenPoint, out Transform objectTransform))
         {
-            return hit.transform.gameObject.TryGetComponent<T>(out raycaseObject);
+            return objectTransform.gameObject.TryGetComponent<T>(out raycaseObject);
         }
 
         raycaseObject = default;

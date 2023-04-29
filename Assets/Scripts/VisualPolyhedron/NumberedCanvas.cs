@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.ProBuilder;
 
 [SelectionBase]
 public class NumberedCanvas : MonoBehaviour
@@ -13,6 +14,17 @@ public class NumberedCanvas : MonoBehaviour
     private void OnValidate()
     {
         SetNumber(number);
+    }
+
+    public void SetPosition(Vector3 center, Vector3 direction)
+    {
+        transform.position = center;
+        transform.forward = direction;
+    }
+
+    public void SetRadius(float radius)
+    {
+        transform.localScale = new Vector3(radius, radius, radius);
     }
 
     public void SetNumber(int n)

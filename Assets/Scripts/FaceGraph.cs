@@ -6,14 +6,15 @@ using System.Runtime.Serialization;
 using TMPro.EditorUtilities;
 using Unity.VisualScripting;
 using UnityEngine;
+//using static GraphStructure<GraphNode, GraphEdge>;
 using DirectedEdge = GraphStructure<Face, Axis>.DirectedEdge;
 
 public class FaceGraph : MonoBehaviour
 {    
-    [SerializeField] private int numberOfFaces = 0;
-    private Face rootFace; // TODO change to private
+    private int numberOfFaces = 0;
+    private Face rootFace; 
     // TODO : add list of edges
-    public bool runButton = false;
+    //public bool runButton = false;
 
     class FaceGraphStructure : GraphStructure<Face, Axis>
     {
@@ -64,6 +65,15 @@ public class FaceGraph : MonoBehaviour
 
     private void SetParentFromDirectedEdges(IEnumerable<DirectedEdge> directedEdges)
     {
+        // Move all the faces to be children of the root face.
+        foreach (DirectedEdge directedEdge in directedEdges)
+        {
+            // Just to make sure that we don't accidently create loops
+            directedEdge.edge.transform.parent = rootFace.transform;
+            if (directedEdge.child != rootFace && directedEdge.child != null)
+                directedEdge.child.transform.parent = rootFace.transform;
+        }
+
         foreach (DirectedEdge directedEdge in directedEdges)
         {
             directedEdge.edge.transform.parent = directedEdge.parent.transform;
@@ -90,24 +100,34 @@ public class FaceGraph : MonoBehaviour
             Debug.Log("The graph was disconnected");
             return null;
         }
-
-        // Move all the faces to be children of the root face.
-        foreach (DirectedEdge directedEdge in directedEdges)
-        {
-            // Just to make sure that we don't accidently create loops
-            directedEdge.edge.transform.parent = rootFace.transform;
-            if (directedEdge.child != rootFace && directedEdge.child != null)
-                directedEdge.child.transform.parent = rootFace.transform;
-        }
-
+                
         SetParentFromDirectedEdges(directedEdges);
 
         return directedEdges;
     }
 
+    public bool IsTree()
+    {
+        if (rootFace == null)
+            return false;
+
+        // Run a DFS algorithm on the faces as nodes, where we start at the root and two faces are connected in the graph
+        // when there is an edge connecting them.
+        // The returned list of edges contains the information of whether the edge is part of a cycle or not.
+        List<DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(rootFace);
+
+        // Count the edges which are not part of the spanning tree and do not lead to 
+        // a null node.
+        int nonTreeEdges = directedEdges.Where(edge => (!edge.treeEdge) && (edge.child!=null)).Count();
+        return nonTreeEdges == 0;
+    }
+
     public void CreateRandomGraph()
     {
-        IEnumerable<DirectedEdge> directedEdges = CreateInitialGraph();
+        IEnumerable<DirectedEdge> directedEdges = dfsGraph.RandomDirectedTree(rootFace);
+        SetParentFromDirectedEdges(directedEdges);
+
+        //IEnumerable<DirectedEdge> directedEdges = CreateInitialGraph();
 
         foreach (DirectedEdge directedEdge in directedEdges)
         {
@@ -151,9 +171,11 @@ public class FaceGraph : MonoBehaviour
         }
     }
 
-    public List<Vector2Int> sampleGraph;
 
-    private void OnValidate()
+
+    //public List<Vector2Int> sampleGraph;
+
+    /*private void OnValidate()
     {
         if (runButton)
         {
@@ -173,7 +195,7 @@ public class FaceGraph : MonoBehaviour
             SimpleGraphNode root = graph.CreateGraph(n, edges);
             graph.GetDirectedEdgesDFS(root);
         }
-    }
+    }*/
 
     public void SetPolyhedron(Face rootFace, int numberOfFaces)
     {

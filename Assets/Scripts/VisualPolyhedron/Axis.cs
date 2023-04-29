@@ -21,6 +21,11 @@ public class Axis : MonoBehaviour
         rotationAxis = GetComponent<RotationAxis>();
     }
 
+    public MouseTarget GetMouseTarget()
+    {
+        return target;
+    }
+
     #region ------------------ faces ------------------
     // TODO : consider moving this into an abstract edge class.
 
@@ -80,11 +85,17 @@ public class Axis : MonoBehaviour
         return otherFace.gameObject.activeSelf ? otherFace : null;
     }
 
+    /// <summary>
+    /// Returns a tuple (i,j) representing this edge, where i, j are the IDs of the faces
+    /// touching this edge in increasing order (i<j).
+    /// </summary>
+    /// <param name="increasingOrder"></param>
+    /// <returns></returns>
     public (int, int) AsTuple(bool increasingOrder = true)
     {
         int n1 = GetFace1().ID;
         int n2 = GetFace2().ID;
-        if (increasingOrder && n2<n1)
+        if (increasingOrder && n2 < n1)
             return (n2, n1);
         return (n1, n2);
     }
@@ -132,13 +143,13 @@ public class Axis : MonoBehaviour
     }
 
 
-    public void SetVisual(Vector3 from, Vector3 to)
+    public void SetVisual(Vector3 from, Vector3 to, float radius = 0.5f)
     {
         transform.position = Vector3.Lerp(from, to, 0.5f);
         Vector3 dir = from - to;
         MathTools.RotateToMatch(transform, transform.up, dir);
 
-        visual.transform.localScale = new Vector3(0.5f, dir.magnitude / 2, 0.5f);
+        visual.transform.localScale = new Vector3(radius, dir.magnitude / 2, radius);
 
         rotationAxis.SetAxis(from, to);
     }

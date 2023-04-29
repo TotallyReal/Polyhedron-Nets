@@ -18,8 +18,7 @@ public class MouseTarget : MonoBehaviour
         this.selectable = selectable;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         targetRenderer = GetComponent<Renderer>();
         //targetRenderer.material = standardMaterial;

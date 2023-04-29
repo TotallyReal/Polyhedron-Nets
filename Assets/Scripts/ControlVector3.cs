@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// An object which invokes a positionChanged event whenever its position changes.
+/// </summary>
 [ExecuteInEditMode]
 public class ControlVector3 : MonoBehaviour
 {
 
     public UnityEvent<Vector3> positionChanged;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
