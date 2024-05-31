@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class FaceMesh : Face
 {
-    private float tileScale = 5f;
+    private float tileScale = 1f;
     private MeshFilter meshFilter;
     private MeshCollider meshCollider;
     private Mesh mesh;

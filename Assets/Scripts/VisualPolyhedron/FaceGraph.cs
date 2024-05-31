@@ -7,7 +7,7 @@ using TMPro.EditorUtilities;
 using Unity.VisualScripting;
 using UnityEngine;
 //using static GraphStructure<GraphNode, GraphEdge>;
-using DirectedEdge = GraphStructure<Face, Axis>.DirectedEdge;
+using DirectedEdge = GraphStructure<Face, PolyhedronEdge>.DirectedEdge;
 
 public class FaceGraph : MonoBehaviour
 {    
@@ -16,7 +16,7 @@ public class FaceGraph : MonoBehaviour
     // TODO : add list of edges
     //public bool runButton = false;
 
-    class FaceGraphStructure : GraphStructure<Face, Axis>
+    class FaceGraphStructure : GraphStructure<Face, PolyhedronEdge>
     {
         private bool randomizeEdges;
 
@@ -25,7 +25,7 @@ public class FaceGraph : MonoBehaviour
             this.randomizeEdges = randomizeEdges;
         }
 
-        public override IEnumerable<Axis> GetEdgesOf(Face node)
+        public override IEnumerable<PolyhedronEdge> GetEdgesOf(Face node)
         {
             if (randomizeEdges)
                 return MathTools.RandomList(node.edges);
@@ -33,17 +33,17 @@ public class FaceGraph : MonoBehaviour
                 return node.edges;
         }
 
-        public override Face GetNode1Of(Axis edge)
+        public override Face GetNode1Of(PolyhedronEdge edge)
         {
             return edge.GetFace1();
         }
 
-        public override Face GetNode2Of(Axis edge)
+        public override Face GetNode2Of(PolyhedronEdge edge)
         {
             return edge.GetFace2();
         }
 
-        public override Face GetOtherNodeOf(Axis edge, Face excludeNode)
+        public override Face GetOtherNodeOf(PolyhedronEdge edge, Face excludeNode)
         {
             return edge.GetOtherFace(excludeNode);
         }

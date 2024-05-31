@@ -8,6 +8,7 @@ using UnityEngine;
 /// <summary>
 /// Used to create visual polyhedrons out of abstract ones
 /// </summary>
+[Serializable]
 public class VisualPolyhedronFactory : MonoBehaviour
 {
     //public static VisualPolyhedronFactory Instance { get; private set; } // TODO should I keep this static variable?
@@ -24,13 +25,14 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [SerializeField] private string polyhedronName;
     [SerializeField] private VisualPolyhedron VisualPolyhedronPrefab;
     [SerializeField] private PolyhedronShape defaultShape = PolyhedronShape.CUBE;
+    [SerializeField] private VisualPolyhedronProperties properties;
     [Header("Faces")]
     [SerializeField] private FaceMesh facePrefab;
     [SerializeField] private float faceRadius = 5;
     [SerializeField] private Material faceMaterial;
     [SerializeField] private Material rootMaterial;
     [Header("Edges")]
-    [SerializeField] private Axis axisPrefab;
+    [SerializeField] private PolyhedronEdge axisPrefab;
     [SerializeField] private float edgeRadius = 0.5f;
     [SerializeField] private bool showEdges = true;
     [SerializeField] private Material edgeMaterial;
@@ -99,7 +101,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
 
     private void SetDefaultFaceGraph(VisualPolyhedron visualPolyhedron)
     {
-        foreach (Axis edge in visualPolyhedron.GetEdges())
+        foreach (PolyhedronEdge edge in visualPolyhedron.GetEdges())
         {
             (int, int) value = edge.AsTuple();
             if (value.Item1 == 0 || value.Item2 == 0 || value.Item1 == 11 || value.Item2 == 11)
@@ -207,18 +209,18 @@ public class VisualPolyhedronFactory : MonoBehaviour
     private VisualPolyhedron CreateFacesAndEdges(AbstractPolyhedron absPolyhedron, VisualPolyhedron visualPolyhedron)
     {
         visualPolyhedron.SetAbstractPolyhedron(absPolyhedron);
-        Dictionary<(int, int), Axis> edgesDict = new Dictionary<(int, int), Axis>();
+        Dictionary<(int, int), PolyhedronEdge> edgesDict = new Dictionary<(int, int), PolyhedronEdge>();
 
         // Try to get the edge vetween the vertices with the given indices, if exists.
         // If not, create it and return it.
-        Axis TryGetEdge(int index1, int index2, Vector3 v1, Vector3 v2)
+        PolyhedronEdge TryGetEdge(int index1, int index2, Vector3 v1, Vector3 v2)
         {
-            Axis edge;
+            PolyhedronEdge edge;
             if (!edgesDict.TryGetValue((index1, index2), out edge) &&
                 !edgesDict.TryGetValue((index2, index1), out edge))
             {
                 // edge does not exist - create it
-                edge = Instantiate<Axis>(axisPrefab, visualPolyhedron.transform);
+                edge = Instantiate<PolyhedronEdge>(axisPrefab, visualPolyhedron.transform);
                 edge.SetVisual(v1, v2, edgeRadius);
 
                 edgesDict.Add((index1, index2), edge);
@@ -257,7 +259,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
             // find\create the edges and connect them to the face
             foreach ((int i, int j) in abstractFace.EdgesIndices())
             {
-                Axis edge = TryGetEdge(i, j, vertices[i], vertices[j]);
+                PolyhedronEdge edge = TryGetEdge(i, j, vertices[i], vertices[j]);
                 if (edge.GetFace1() == null)
                     edge.SetFace1(face);
                 else
@@ -285,7 +287,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
         float rotationAngle = 180 - Vector3.Angle(normalDir, visualPolyhedron.transform.up);
 
         // rotate the polyhedron, so that the root face will be at the bottom.
-        foreach (Axis axis in visualPolyhedron.GetEdges())
+        foreach (PolyhedronEdge axis in visualPolyhedron.GetEdges())
         {
             axis.transform.RotateAround(Vector3.zero, rotationAxis, -rotationAngle);
         }

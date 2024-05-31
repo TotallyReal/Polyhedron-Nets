@@ -1,3 +1,4 @@
+using Codice.CM.Common.Tree;
 using System.Collections.Generic;
 
 public class SimpleGraphNode
@@ -29,10 +30,20 @@ public class SimpleGraphEdge
 /// <summary>
 /// A graph with basic node and edge structure.
 /// </summary>
-public class SimpleGraph : GraphStructure<SimpleGraphNode, SimpleGraphEdge>
+public class SimpleGraph : LocalGraph<SimpleGraphNode, SimpleGraphEdge>
 {
 
     #region ---------- The node and edge structure of the graph ----------
+
+    public override bool AreEqual(SimpleGraphNode node1, SimpleGraphNode node2)
+    {
+        return node1.index == node2.index; // TODO: maybe compare the nodes directly?
+    }
+
+    public override bool AreEqual(SimpleGraphEdge edge1, SimpleGraphEdge edge2)
+    {
+        return edge1 == edge2;
+    }
 
     public override IEnumerable<SimpleGraphEdge> GetEdgesOf(SimpleGraphNode node)
     {
@@ -50,6 +61,7 @@ public class SimpleGraph : GraphStructure<SimpleGraphNode, SimpleGraphEdge>
     }
 
     #endregion ---------- The node and edge structure of the graph ----------
+
 
     /// <summary>
     /// Creates a new graph with #numVertices vertices. Numbering them from 0 to numVertices-1,

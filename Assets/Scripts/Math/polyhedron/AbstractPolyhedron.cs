@@ -223,7 +223,7 @@ public class AbstractPolyhedron
         return faces;
     }
 
-    internal Vector3[] GetVertices()
+    public Vector3[] GetVertices()
     {
         return (from v in vertices
                 select v.position).ToArray<Vector3>();

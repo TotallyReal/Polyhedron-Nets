@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Axis : MonoBehaviour
+public class PolyhedronEdge : MonoBehaviour
 {
 
     [SerializeField] private Face face1;

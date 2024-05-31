@@ -5,7 +5,7 @@ using UnityEngine;
 public class Face : MonoBehaviour
 {
     public int ID { get; set; }
-    public List<Axis> edges;
+    public List<PolyhedronEdge> edges;
 
     virtual public Vector3 Normal()
     {

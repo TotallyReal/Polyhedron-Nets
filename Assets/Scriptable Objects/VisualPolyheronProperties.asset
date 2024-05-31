@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70fea31708a9d974993d399e01be5ccb, type: 3}
+  m_Name: VisualPolyheronProperties
+  m_EditorClassIdentifier: 
+  facePrefab: {fileID: 4496706682133013413, guid: d0f8c8e0b3f30ab48bb4f3bcad56487a, type: 3}
+  faceRadius: 1
+  faceMaterial: {fileID: 2100000, guid: 118675f9ee3b22c43a2f8841d6206b1b, type: 2}
+  rootMaterial: {fileID: 2100000, guid: d7345edb353d0794296950a9adb3ad4d, type: 2}
+  axisPrefab: {fileID: 6820755328241383506, guid: 53a73507b27643f49880569680aaa671, type: 3}
+  edgeRadius: 0.1
+  showEdges: 1
+  edgeMaterial: {fileID: 2100000, guid: 78f6c3f1d47eef84f9ee5e607fad4c0c, type: 2}
+  numberedCanvasPrefab: {fileID: 5375164846631267126, guid: 6b7b10394835d0a46945efddac0c6860, type: 3}
+  numberRadius: 0.25
+  showNumbers: 1
+  numberLabelDistance: 0.003

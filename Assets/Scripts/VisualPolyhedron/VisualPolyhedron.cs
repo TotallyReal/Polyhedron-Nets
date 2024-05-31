@@ -9,14 +9,14 @@ public class VisualPolyhedron : MonoBehaviour
     [SerializeField] private Material faceMaterial;
     [SerializeField] private Material edgeMaterial;
 
-    private List<Axis> edges;
+    private List<PolyhedronEdge> edges;
     private List<FaceMesh> faces;
     public FaceMesh RootFace { get; set; }
     private FaceGraph faceGraph;
 
     private void Awake()
     {
-        edges = new List<Axis>();
+        edges = new List<PolyhedronEdge>();
         faces = new List<FaceMesh>();
 
         faceGraph = GetComponent<FaceGraph>();
@@ -69,7 +69,7 @@ public class VisualPolyhedron : MonoBehaviour
     #endregion
 
     #region --------------------- edges ---------------------
-    public void AddEdge(Axis axis)
+    public void AddEdge(PolyhedronEdge axis)
     {
         edges.Add(axis);
     }
@@ -83,7 +83,7 @@ public class VisualPolyhedron : MonoBehaviour
         }
     }
 
-    public IEnumerable<Axis> GetEdges()
+    public IEnumerable<PolyhedronEdge> GetEdges()
     {
         return edges;
     }
