@@ -80,13 +80,13 @@ public class CameraSwitch : Focus
         edgePicker.enabled = true;
         toCamera.gameObject.SetActive(true);
         clickObject.gameObject.SetActive(false);
-        StartCoroutine(DisableClickObject(0.1f));
+        //clickObject.gameObject.SetActive(false);
+        //StartCoroutine(DisableClickObject(0.1f));
     }
 
     private IEnumerator DisableClickObject(float delay)
     {
         yield return new WaitForSeconds(delay);
-        clickObject.gameObject.SetActive(false);
     }
 
     /*

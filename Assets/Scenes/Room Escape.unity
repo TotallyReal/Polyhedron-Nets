@@ -8200,12 +8200,12 @@ GameObject:
   - component: {fileID: 554824227}
   - component: {fileID: 554824226}
   m_Layer: 0
-  m_Name: axis camera
+  m_Name: rotator axis camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &554824225
 Transform:
   m_ObjectHideFlags: 0
@@ -8233,7 +8233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f7519f6d763d0b4091a43ca9f468712, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lookAtTarget: {fileID: 949032007}
+  lookAtTarget: {fileID: 1760674145}
   horizontalSpeed: 1
   verticalSpeed: 1
   radialSpeed: 1
@@ -10764,7 +10764,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh24890
+  m_Name: pb_Mesh74134
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -11865,6 +11865,7 @@ GameObject:
   - component: {fileID: 949032011}
   - component: {fileID: 949032010}
   - component: {fileID: 949032012}
+  - component: {fileID: 949032013}
   m_Layer: 0
   m_Name: Polyhedron Creator
   m_TagString: Untagged
@@ -11952,7 +11953,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 949032007}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 642c80887ed4cb44db398d5a2efbf29e, type: 3}
   m_Name: 
@@ -11961,6 +11962,24 @@ MonoBehaviour:
   clickObject: {fileID: 159321006}
   toCamera: {fileID: 1024600820}
   edgePicker: {fileID: 949032011}
+--- !u!114 &949032013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 949032007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b08c5c089a43854cb3ca58c2d160b27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainFocus: {fileID: 911912861}
+  clickObject: {fileID: 159321006}
+  scripts:
+  - {fileID: 949032011}
+  objects:
+  - {fileID: 1024600819}
 --- !u!43 &962781031
 Mesh:
   m_ObjectHideFlags: 0
@@ -14202,7 +14221,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1024600820
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15814,7 +15833,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1129168361}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0b08c5c089a43854cb3ca58c2d160b27, type: 3}
   m_Name: 
@@ -24045,7 +24064,7 @@ GameObject:
   - component: {fileID: 1760674148}
   - component: {fileID: 1760674147}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: rotator cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

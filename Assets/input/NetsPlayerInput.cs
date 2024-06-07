@@ -296,7 +296,7 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                     ""id"": ""ec0c72a3-fe3f-48ca-899b-22e52682faa9"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": ""MultiTap(tapDelay=1)""
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -358,7 +358,7 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""e7996954-efc5-4134-a719-77aa04e731af"",
-                    ""path"": ""<Mouse>/leftButton"",
+                    ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

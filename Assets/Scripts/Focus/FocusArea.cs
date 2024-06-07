@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class DoubleClickFocus : Focus
+public class FocusArea : Focus
 {
 
     [SerializeField] private Focus mainFocus;
@@ -15,8 +15,8 @@ public class DoubleClickFocus : Focus
 
     private void Awake()
     {
-        //input = new NetsPlayerInput();
-        //input.Camera.Enable();
+        input = new NetsPlayerInput();
+        input.Player.Enable();
     }
 
     private void Start()
@@ -80,6 +80,6 @@ public class DoubleClickFocus : Focus
             obj.SetActive(true);
         }
 
-        clickObject.gameObject.SetActive(true);
+        clickObject.gameObject.SetActive(false);
     }
 }
