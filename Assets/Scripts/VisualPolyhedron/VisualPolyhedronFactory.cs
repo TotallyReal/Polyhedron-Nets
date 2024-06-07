@@ -16,9 +16,11 @@ public class VisualPolyhedronFactory : MonoBehaviour
     public enum PolyhedronShape
     {
         CUBE,
+        OCTAHEDRON,
         CUBE_COLLECTION,
         DODECAHEDRON,
-        ISOCAHEDRON
+        ICOSAHEDRON,
+        TETRAHEDRON
     }
 
     [Header("Polyhedron components")]
@@ -31,6 +33,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [SerializeField] private float faceRadius = 5;
     [SerializeField] private Material faceMaterial;
     [SerializeField] private Material rootMaterial;
+    [SerializeField] private bool rootDownward = true;
     [Header("Edges")]
     [SerializeField] private PolyhedronEdge axisPrefab;
     [SerializeField] private float edgeRadius = 0.5f;
@@ -52,6 +55,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [SerializeField] private PolyhedronPosition polyhedronPosition;
     [Header("MISC")]
     [SerializeField] private bool randomOpen = false;
+    [SerializeField] private int seed = -1;
 
     private VisualPolyhedron visualPolyhedron = null;
 
@@ -85,9 +89,13 @@ public class VisualPolyhedronFactory : MonoBehaviour
         {
             case PolyhedronShape.CUBE:
                 return AbstractGroupPolyhedron.Cube(faceRadius);
+            case PolyhedronShape.OCTAHEDRON:
+                return AbstractGroupPolyhedron.Octahedron(faceRadius);
+            case PolyhedronShape.TETRAHEDRON:
+                return AbstractGroupPolyhedron.Tetrahedron(faceRadius);
             case PolyhedronShape.DODECAHEDRON:
                 return AbstractGroupPolyhedron.Dodecahedron(faceRadius);                
-            case PolyhedronShape.ISOCAHEDRON:
+            case PolyhedronShape.ICOSAHEDRON:
                 return AbstractGroupPolyhedron.Isocahedron(faceRadius);
             case PolyhedronShape.CUBE_COLLECTION:
                 return new CubicPolyhedron(
@@ -126,7 +134,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
         }
 
         AbstractPolyhedron abstractPolyhedron = GetDefaultPolyhedron();
-        visualPolyhedron = CreatePolyhedron(abstractPolyhedron).GetComponent<VisualPolyhedron>();
+        visualPolyhedron = CreatePolyhedron(abstractPolyhedron, rootDownward).GetComponent<VisualPolyhedron>();
         visualPolyhedron.gameObject.name = polyhedronName != null ? polyhedronName : "Polyhedron";
 
         // position the polyhedron
@@ -146,10 +154,17 @@ public class VisualPolyhedronFactory : MonoBehaviour
             }
         }
 
+        // TODO: change parent to be the rootPosition
+        visualPolyhedron.transform.SetParent(transform);
+
         //SetDefaultFaceGraph(visualPolyhedron);
 
         if (randomOpen)
         {
+            if (seed > -1)
+            {
+                UnityEngine.Random.InitState(seed);
+            }
             FaceGraph faceGraph = visualPolyhedron.GetComponent<FaceGraph>();
             faceGraph.CreateRandomGraph();
         }
@@ -297,7 +312,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
         }
     }
 
-    public GameObject CreatePolyhedron(AbstractPolyhedron absPolyhedron)
+    public GameObject CreatePolyhedron(AbstractPolyhedron absPolyhedron, bool rootDownward = true)
     {
         // ------------------- create polyhedron object -------------------
 
@@ -308,7 +323,10 @@ public class VisualPolyhedronFactory : MonoBehaviour
         VisualPolyhedron visualPolyhedron = Instantiate<VisualPolyhedron>(VisualPolyhedronPrefab);
         //VisualPolyhedron visualPolyhedron = polyhedron.AddComponent<VisualPolyhedron>();
         CreateFacesAndEdges(absPolyhedron, visualPolyhedron);
-        RotatePolyhedron(visualPolyhedron);  // so that the root face will face downwards
+        if (rootDownward)
+        {
+            RotatePolyhedron(visualPolyhedron);  // so that the root face will face downwards
+        }
 
         visualPolyhedron.SetFaceMaterial(faceMaterial);
         visualPolyhedron.SetEdgeMaterial(edgeMaterial);

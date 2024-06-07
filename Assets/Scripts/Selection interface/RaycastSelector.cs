@@ -75,6 +75,11 @@ public class RaycastSelector : MonoBehaviour
         }
     }
 
+    public bool ObjectAtMousePosition(out Transform mouseObject)
+    {
+        return ScreenRaycastObject(mousePosition(), out mouseObject);
+    }
+
     #endregion
 
     #region --------------- (static) screen raycast ---------------
@@ -103,14 +108,14 @@ public class RaycastSelector : MonoBehaviour
         return false;
     }
 
-    public static bool ScreenRaycastOfType<T>(Vector2 screenPoint, out T raycaseObject)
+    public static bool ScreenRaycastOfType<T>(Vector2 screenPoint, out T raycastObject)
     {
         if (ScreenRaycastObject(screenPoint, out Transform objectTransform))
         {
-            return objectTransform.gameObject.TryGetComponent<T>(out raycaseObject);
+            return objectTransform.gameObject.TryGetComponent<T>(out raycastObject);
         }
 
-        raycaseObject = default;
+        raycastObject = default;
         return false;
     }
 

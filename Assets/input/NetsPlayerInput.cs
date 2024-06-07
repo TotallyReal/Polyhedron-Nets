@@ -265,6 +265,38 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""RotateX"",
+                    ""type"": ""Button"",
+                    ""id"": ""39a121e2-f2b0-4eb2-abad-d9ba06332922"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""RotateY"",
+                    ""type"": ""Button"",
+                    ""id"": ""e5018d7f-968d-4122-9fbc-ad25067e297a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""RotateZ"",
+                    ""type"": ""Button"",
+                    ""id"": ""9c12db34-e08f-49c7-9917-d82bc4c856b0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Focus"",
+                    ""type"": ""Button"",
+                    ""id"": ""ec0c72a3-fe3f-48ca-899b-22e52682faa9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""MultiTap(tapDelay=1)""
                 }
             ],
             ""bindings"": [
@@ -289,6 +321,50 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                     ""action"": ""Restart"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""67cee928-3dac-4686-9eb9-f9ceff85899b"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateX"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fbc5b884-d3d6-4087-8d79-4ebdeecda2d7"",
+                    ""path"": ""<Keyboard>/y"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateY"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cb520cf9-8385-4d07-a63d-e95bed177f5b"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateZ"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e7996954-efc5-4134-a719-77aa04e731af"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Focus"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -308,6 +384,10 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Unfold = m_Player.FindAction("Unfold", throwIfNotFound: true);
         m_Player_Restart = m_Player.FindAction("Restart", throwIfNotFound: true);
+        m_Player_RotateX = m_Player.FindAction("RotateX", throwIfNotFound: true);
+        m_Player_RotateY = m_Player.FindAction("RotateY", throwIfNotFound: true);
+        m_Player_RotateZ = m_Player.FindAction("RotateZ", throwIfNotFound: true);
+        m_Player_Focus = m_Player.FindAction("Focus", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -449,12 +529,20 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
     private IPlayerActions m_PlayerActionsCallbackInterface;
     private readonly InputAction m_Player_Unfold;
     private readonly InputAction m_Player_Restart;
+    private readonly InputAction m_Player_RotateX;
+    private readonly InputAction m_Player_RotateY;
+    private readonly InputAction m_Player_RotateZ;
+    private readonly InputAction m_Player_Focus;
     public struct PlayerActions
     {
         private @NetsPlayerInput m_Wrapper;
         public PlayerActions(@NetsPlayerInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Unfold => m_Wrapper.m_Player_Unfold;
         public InputAction @Restart => m_Wrapper.m_Player_Restart;
+        public InputAction @RotateX => m_Wrapper.m_Player_RotateX;
+        public InputAction @RotateY => m_Wrapper.m_Player_RotateY;
+        public InputAction @RotateZ => m_Wrapper.m_Player_RotateZ;
+        public InputAction @Focus => m_Wrapper.m_Player_Focus;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -470,6 +558,18 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                 @Restart.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRestart;
                 @Restart.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRestart;
                 @Restart.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRestart;
+                @RotateX.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRotateX;
+                @RotateX.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRotateX;
+                @RotateX.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRotateX;
+                @RotateY.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRotateY;
+                @RotateY.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRotateY;
+                @RotateY.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRotateY;
+                @RotateZ.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRotateZ;
+                @RotateZ.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRotateZ;
+                @RotateZ.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRotateZ;
+                @Focus.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFocus;
+                @Focus.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFocus;
+                @Focus.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFocus;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -480,6 +580,18 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                 @Restart.started += instance.OnRestart;
                 @Restart.performed += instance.OnRestart;
                 @Restart.canceled += instance.OnRestart;
+                @RotateX.started += instance.OnRotateX;
+                @RotateX.performed += instance.OnRotateX;
+                @RotateX.canceled += instance.OnRotateX;
+                @RotateY.started += instance.OnRotateY;
+                @RotateY.performed += instance.OnRotateY;
+                @RotateY.canceled += instance.OnRotateY;
+                @RotateZ.started += instance.OnRotateZ;
+                @RotateZ.performed += instance.OnRotateZ;
+                @RotateZ.canceled += instance.OnRotateZ;
+                @Focus.started += instance.OnFocus;
+                @Focus.performed += instance.OnFocus;
+                @Focus.canceled += instance.OnFocus;
             }
         }
     }
@@ -499,5 +611,9 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
     {
         void OnUnfold(InputAction.CallbackContext context);
         void OnRestart(InputAction.CallbackContext context);
+        void OnRotateX(InputAction.CallbackContext context);
+        void OnRotateY(InputAction.CallbackContext context);
+        void OnRotateZ(InputAction.CallbackContext context);
+        void OnFocus(InputAction.CallbackContext context);
     }
 }

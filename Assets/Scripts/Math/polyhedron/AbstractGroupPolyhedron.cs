@@ -53,6 +53,26 @@ public class AbstractGroupPolyhedron : AbstractPolyhedron
             v);
     }
 
+    public static AbstractGroupPolyhedron Octahedron(float radius)
+    {
+        Vector3 v = new Vector3(0, radius, 0);
+
+        return new AbstractGroupPolyhedron(
+            Matrix.Rotation3(0, 1, 0, Mathf.PI / 2),            // vertex stabilizer
+            Matrix.Rotation3(1, 1, 1, 2 * Mathf.PI / 3),        // face stabilizer
+            v);
+    }
+
+    public static AbstractGroupPolyhedron Tetrahedron(float radius)
+    {
+        Vector3 v = new Vector3(0, radius, 0);
+
+        return new AbstractGroupPolyhedron(
+            Matrix.Rotation3(0, 1, 0, 2 * Mathf.PI / 3),                // vertex stabilizer
+            Matrix.Rotation3(0, 1, Mathf.Sqrt(8), 2 * Mathf.PI / 3),    // face stabilizer
+            v);
+    }
+
     public static AbstractGroupPolyhedron Dodecahedron(float radius)
     {
         Vector3 v = new Vector3(1, 1, 1);
