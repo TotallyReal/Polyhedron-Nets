@@ -49,6 +49,9 @@ public class RaycastSelector : MonoBehaviour
     /// </summary>
     public event EventHandler<Transform> OnObjectPressed;
 
+
+    public event EventHandler<(Transform, RaycastHit)> OnObjectPressedPlus;
+
     /// <summary>
     /// Return the position of the mouse on screen, used for raycasting.
     /// </summary>
@@ -67,17 +70,18 @@ public class RaycastSelector : MonoBehaviour
     {
         if (!mouseRaycastActive)
             return;
-        if (ScreenRaycastObject(mousePosition(), out Transform mouseObject))
+        if (ScreenRaycastObject(mousePosition(), out Transform mouseObject, out RaycastHit hit))
         {
             if (mouseLogs)
                 Debug.Log($"{mouseObject.gameObject.name} pressed");
             OnObjectPressed?.Invoke(this, mouseObject);
+            OnObjectPressedPlus?.Invoke(this, (mouseObject, hit));
         }
     }
 
     public bool ObjectAtMousePosition(out Transform mouseObject)
     {
-        return ScreenRaycastObject(mousePosition(), out mouseObject);
+        return ScreenRaycastObject(mousePosition(), out mouseObject, out RaycastHit hit);
     }
 
     #endregion
@@ -96,11 +100,12 @@ public class RaycastSelector : MonoBehaviour
     /// </summary>
     /// <param name="objectTransform">The possible object at the screenPoint position</param>
     /// <returns>A bool showing if there is an objected pointed at</returns>
-    public static bool ScreenRaycastObject(Vector2 screenPoint, out Transform objectTransform)
+    public static bool ScreenRaycastObject(
+        Vector2 screenPoint, out Transform objectTransform, out RaycastHit hit)
     {
         objectTransform = null;
 
-        if (ScreenRaycast(screenPoint, out RaycastHit hit))
+        if (ScreenRaycast(screenPoint, out hit))
         {
             objectTransform = hit.transform;
             return true;
@@ -108,7 +113,7 @@ public class RaycastSelector : MonoBehaviour
         return false;
     }
 
-    public static bool ScreenRaycastOfType<T>(Vector2 screenPoint, out T raycastObject)
+    /*public static bool ScreenRaycastOfType<T>(Vector2 screenPoint, out T raycastObject)
     {
         if (ScreenRaycastObject(screenPoint, out Transform objectTransform))
         {
@@ -117,7 +122,7 @@ public class RaycastSelector : MonoBehaviour
 
         raycastObject = default;
         return false;
-    }
+    }*/
 
     #endregion
 }

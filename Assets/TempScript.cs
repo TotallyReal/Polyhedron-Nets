@@ -11,8 +11,14 @@ public class TempScript : MonoBehaviour
         input.Player.Enable();
         input.Player.Focus.performed += Focus_performed;
         input.Player.RotateX.performed += RotateX_performed;
+        input.Player.Action.performed += Action_performed;
         input.MouseSelection.Enable();
         input.MouseSelection.EdgeSelect.performed += EdgeSelect_performed;
+    }
+
+    private void Action_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        Debug.Log("Action");
     }
 
     private void EdgeSelect_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)

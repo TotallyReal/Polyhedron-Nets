@@ -6,6 +6,11 @@ using System;
 using UnityEngine.UIElements;
 using System.Xml.Linq;
 
+/// <summary>
+/// Represent an "abstract" mathematical polyhedron in R^3.
+/// It is abstract in the sense that there is no visual component, e.g. material
+/// for the faces, thickness of edges, etc.
+/// </summary>
 public class AbstractPolyhedron
 {
 
@@ -227,6 +232,12 @@ public class AbstractPolyhedron
     {
         return (from v in vertices
                 select v.position).ToArray<Vector3>();
+    }
+
+    // does not check that the indices are valid.
+    public IEnumerable<Vector3> GetVerticesAt(IEnumerable<int> indices)
+    {
+        return indices.Select(i => vertices[i].position);
     }
 
 }

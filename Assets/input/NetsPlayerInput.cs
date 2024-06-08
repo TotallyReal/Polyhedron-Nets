@@ -297,6 +297,14 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Action"",
+                    ""type"": ""Button"",
+                    ""id"": ""5bda3b14-0559-4c5e-8cd7-2d054714d9ac"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -365,6 +373,39 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                     ""action"": ""Focus"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Button With One Modifier"",
+                    ""id"": ""afbe3ef3-69bc-4080-90f9-674cfb61df6b"",
+                    ""path"": ""ButtonWithOneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Action"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""1eebb375-f4cf-4fd2-8646-5db0fe77a87f"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Action"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""button"",
+                    ""id"": ""0811bd27-59ff-4e9f-b09b-8f47123f5975"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Action"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -388,6 +429,7 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
         m_Player_RotateY = m_Player.FindAction("RotateY", throwIfNotFound: true);
         m_Player_RotateZ = m_Player.FindAction("RotateZ", throwIfNotFound: true);
         m_Player_Focus = m_Player.FindAction("Focus", throwIfNotFound: true);
+        m_Player_Action = m_Player.FindAction("Action", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -533,6 +575,7 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_RotateY;
     private readonly InputAction m_Player_RotateZ;
     private readonly InputAction m_Player_Focus;
+    private readonly InputAction m_Player_Action;
     public struct PlayerActions
     {
         private @NetsPlayerInput m_Wrapper;
@@ -543,6 +586,7 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
         public InputAction @RotateY => m_Wrapper.m_Player_RotateY;
         public InputAction @RotateZ => m_Wrapper.m_Player_RotateZ;
         public InputAction @Focus => m_Wrapper.m_Player_Focus;
+        public InputAction @Action => m_Wrapper.m_Player_Action;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -570,6 +614,9 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                 @Focus.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFocus;
                 @Focus.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFocus;
                 @Focus.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFocus;
+                @Action.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAction;
+                @Action.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAction;
+                @Action.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAction;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -592,6 +639,9 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                 @Focus.started += instance.OnFocus;
                 @Focus.performed += instance.OnFocus;
                 @Focus.canceled += instance.OnFocus;
+                @Action.started += instance.OnAction;
+                @Action.performed += instance.OnAction;
+                @Action.canceled += instance.OnAction;
             }
         }
     }
@@ -615,5 +665,6 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
         void OnRotateY(InputAction.CallbackContext context);
         void OnRotateZ(InputAction.CallbackContext context);
         void OnFocus(InputAction.CallbackContext context);
+        void OnAction(InputAction.CallbackContext context);
     }
 }
