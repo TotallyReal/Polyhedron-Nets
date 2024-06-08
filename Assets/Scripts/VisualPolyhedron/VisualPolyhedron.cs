@@ -43,6 +43,10 @@ public class VisualPolyhedron : MonoBehaviour
     {
         this.absPolyhedron = absPolyhedron;
     }
+    public AbstractPolyhedron GetAbstractPolyhedron()
+    {
+        return absPolyhedron; // TODO: Either return a copy, or remove this method
+    }
 
     public FaceGraph GetFaceGraph()
     {
@@ -97,4 +101,21 @@ public class VisualPolyhedron : MonoBehaviour
         //return absPolyhedron.NearRotationAxis(v, error);
         return false;
     }
+
+    #region --------------------- vertices ---------------------
+    // TODO: Right now, they are not rotating
+
+    public void AddVertices(Transform vertexPrefab)
+    {
+        GameObject vertices = new GameObject("Vertices");
+        vertices.transform.parent = transform;
+        vertices.transform.localPosition = Vector3.zero;
+        foreach (var v in absPolyhedron.GetVertices())
+        {
+            Transform vertex = Instantiate<Transform>(vertexPrefab, vertices.transform);
+            vertex.localPosition = v;
+        }
+    }
+
+    #endregion
 }

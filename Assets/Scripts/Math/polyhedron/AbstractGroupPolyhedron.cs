@@ -13,6 +13,7 @@ using static UnityEditor.IMGUI.Controls.PrimitiveBoundsHandle;
 /// 1. A vertex stabilizer,
 /// 2. A face stabilizer.
 /// </summary>
+[System.Serializable]
 public class AbstractGroupPolyhedron : AbstractPolyhedron
 {
 

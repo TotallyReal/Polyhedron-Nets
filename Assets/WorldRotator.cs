@@ -7,13 +7,16 @@ using static UnityEditor.IMGUI.Controls.PrimitiveBoundsHandle;
 public class WorldRotator : MonoBehaviour
 {
 
+    [SerializeField] private VisualPolyhedronFactory factory;
     [SerializeField] private Transform rotationObject;
 
     [SerializeField] private float rotationTimeSec = 1f;
     private bool isRotating;
     private NetsPlayerInput input;
 
-    public struct RotationOp
+    // TODO: Finally..........
+    [System.Serializable]
+    public class RotationOp
     {
         public RotationOp(Vector3 axis, float angle)
         {
@@ -21,14 +24,15 @@ public class WorldRotator : MonoBehaviour
             this.angle = angle;
         }
 
-        public Vector3 normalizedAxis { get; }
-        public float angle { get; }
+        // TODO: I hate serializing objects in unity... This is a nightmare
+        [SerializeField] public Vector3 normalizedAxis;
+        [SerializeField] public float angle;
 
         public override string ToString() => $"{normalizedAxis}[{angle}]";
     }
 
-
-    private List<RotationOp> axes;
+    // TODO: I hate everything about this
+    [SerializeField] private List<RotationOp> axes;
 
     public static List<RotationOp> GetRotationsFromPolyhedron(AbstractGroupPolyhedron groupPoly)
     {
@@ -63,6 +67,23 @@ public class WorldRotator : MonoBehaviour
         input.Player.Enable();
 
         SetRotationOp(GetRotationsFromPolyhedron(AbstractGroupPolyhedron.Cube(1)));
+    }
+
+    private void Start()
+    {
+        if (factory != null) {
+            AbstractPolyhedron abstractPolyhedron = factory.GetAbstractPolyhedron();
+            if (abstractPolyhedron is AbstractGroupPolyhedron)
+            {
+                SetRotationOp(GetRotationsFromPolyhedron((AbstractGroupPolyhedron)abstractPolyhedron));
+            }
+            factory.OnPolyhedroneGenerated += OnPolyhedroneGenerated;
+        }
+    }
+
+    private void OnPolyhedroneGenerated(object sender, AbstractGroupPolyhedron absGroupPoly)
+    {
+        SetRotationOp(GetRotationsFromPolyhedron(absGroupPoly));
     }
 
     public void SetRotationOp(List<RotationOp> rotations)

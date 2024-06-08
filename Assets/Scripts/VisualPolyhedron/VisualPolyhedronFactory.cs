@@ -28,6 +28,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [SerializeField] private VisualPolyhedron VisualPolyhedronPrefab;
     [SerializeField] private PolyhedronShape defaultShape = PolyhedronShape.CUBE;
     [SerializeField] private VisualPolyhedronProperties properties;
+    [SerializeField] private bool createPolyhedronOnStartup = true;
     [Header("Faces")]
     [SerializeField] private FaceMesh facePrefab;
     [SerializeField] private float faceRadius = 5;
@@ -39,6 +40,8 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [SerializeField] private float edgeRadius = 0.5f;
     [SerializeField] private bool showEdges = true;
     [SerializeField] private Material edgeMaterial;
+    [Header("Vertices")]
+    [SerializeField] private Transform vertexPrefab;
     [Header("Numbers")]
     [SerializeField] private NumberedCanvas numberedCanvasPrefab;
     [SerializeField] private float numberRadius = 2;
@@ -57,11 +60,11 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [SerializeField] private bool randomOpen = false;
     [SerializeField] private int seed = -1;
 
-    private VisualPolyhedron visualPolyhedron = null;
 
     private void Start()
     {
-        CreatePolyhedron();
+        if (createPolyhedronOnStartup)
+            CreatePolyhedron();
     }
 
     private List<Vector3Int> cubePositions = new List<Vector3Int>(){
@@ -107,6 +110,9 @@ public class VisualPolyhedronFactory : MonoBehaviour
         }
     }
 
+
+    public event EventHandler<AbstractGroupPolyhedron> OnPolyhedroneGenerated;
+
     private void SetDefaultFaceGraph(VisualPolyhedron visualPolyhedron)
     {
         foreach (PolyhedronEdge edge in visualPolyhedron.GetEdges())
@@ -139,24 +145,30 @@ public class VisualPolyhedronFactory : MonoBehaviour
     {
         if (visualPolyhedron != null)
         {
-            if (Application.isEditor)
+            if (Application.isPlaying)
             {
-                DestroyImmediate(visualPolyhedron.gameObject);
+                Destroy(visualPolyhedron.gameObject);
             }
             else
             {
-                Destroy(visualPolyhedron.gameObject);
+                DestroyImmediate(visualPolyhedron.gameObject);
             }
         }
 
     }
+
+    // TODO: Adding serializeField, so I can generate it in editor.
+    //       Need to refactor the whole code.
+    [Header("Serialized polyhedron for editor")]
+    private AbstractPolyhedron abstractPolyhedron;
+    [SerializeField] private VisualPolyhedron visualPolyhedron = null;
 
     /// <summary>
     /// Creates a new polyhedron, without destroying existing polyhedrons
     /// </summary>
     public void CreateNewPolyhedron() { 
 
-        AbstractPolyhedron abstractPolyhedron = GetDefaultPolyhedron();
+        abstractPolyhedron = GetDefaultPolyhedron();
         visualPolyhedron = CreatePolyhedron(abstractPolyhedron, rootDownward).GetComponent<VisualPolyhedron>();
         visualPolyhedron.gameObject.name = polyhedronName != null ? polyhedronName : "Polyhedron";
 
@@ -191,8 +203,19 @@ public class VisualPolyhedronFactory : MonoBehaviour
             FaceGraph faceGraph = visualPolyhedron.GetComponent<FaceGraph>();
             faceGraph.CreateRandomGraph();
         }
+
+        if (abstractPolyhedron is AbstractGroupPolyhedron)
+        {
+            OnPolyhedroneGenerated?.Invoke(this, (AbstractGroupPolyhedron)abstractPolyhedron);
+        }
     }
 
+    public void AddVertices()
+    {
+        if (visualPolyhedron == null || vertexPrefab == null)
+            return;
+        visualPolyhedron.AddVertices(vertexPrefab);
+    }
     /*public FaceMesh CreatePolyhedron(Vector3[] vertices, List<int[]> facesList) // TODO restore this method
     {
         AbstractPolyhedron absPolyhedron = new AbstractPolyhedron();
@@ -313,7 +336,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
 
     #endregion
 
-    /// <summary>
+/// <summary>
     /// Rotates the polyhedron so that the root mesh will be facing downwards
     /// </summary>
     /// <param name="components"></param>
@@ -371,6 +394,15 @@ public class VisualPolyhedronFactory : MonoBehaviour
     public VisualPolyhedron GetVisualPolyhedron()
     {
         return visualPolyhedron;
+    }
+
+    public AbstractPolyhedron GetAbstractPolyhedron()
+    {
+        if (visualPolyhedron != null)
+        {
+            return visualPolyhedron.GetAbstractPolyhedron();
+        }
+        return null;
     }
 
     public void CompareUnfolding()

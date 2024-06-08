@@ -26,6 +26,11 @@ public class VisualPolyhedronFactoryEditor : Editor
             Debug.Log("Building New...");
             factory.CreateNewPolyhedron();
         }
+        if (GUILayout.Button("Add vertices"))
+        {
+            Debug.Log("Adding vertices...");
+            factory.AddVertices();
+        }
         base.OnInspectorGUI();
     }
 

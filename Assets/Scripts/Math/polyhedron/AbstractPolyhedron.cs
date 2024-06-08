@@ -11,6 +11,7 @@ using System.Xml.Linq;
 /// It is abstract in the sense that there is no visual component, e.g. material
 /// for the faces, thickness of edges, etc.
 /// </summary>
+[System.Serializable]
 public class AbstractPolyhedron
 {
 

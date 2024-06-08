@@ -8,7 +8,7 @@ using UnityEngine.ProBuilder;
 public class NumberedCanvas : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI text;
-    [Range(0,100)]
+    [Range(0,101)]
     [SerializeField] private int number;
 
     private void OnValidate()
@@ -29,6 +29,7 @@ public class NumberedCanvas : MonoBehaviour
 
     public void SetNumber(int n)
     {
+        number = n;
         int digits = (n == 0) ? 1 : 1 + Mathf.FloorToInt(Mathf.Log10(n));
         text.text = "" + n;
         switch (digits)
