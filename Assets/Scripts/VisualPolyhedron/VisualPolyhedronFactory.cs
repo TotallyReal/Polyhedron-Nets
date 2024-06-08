@@ -126,12 +126,35 @@ public class VisualPolyhedronFactory : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Creates a new polyhedron, and destorys the previous one if exists
+    /// </summary>
     public void CreatePolyhedron()
+    {
+        DestroyPolyhedron();
+        CreateNewPolyhedron();
+    }
+
+    public void DestroyPolyhedron()
     {
         if (visualPolyhedron != null)
         {
-            Destroy(visualPolyhedron.gameObject);
+            if (Application.isEditor)
+            {
+                DestroyImmediate(visualPolyhedron.gameObject);
+            }
+            else
+            {
+                Destroy(visualPolyhedron.gameObject);
+            }
         }
+
+    }
+
+    /// <summary>
+    /// Creates a new polyhedron, without destroying existing polyhedrons
+    /// </summary>
+    public void CreateNewPolyhedron() { 
 
         AbstractPolyhedron abstractPolyhedron = GetDefaultPolyhedron();
         visualPolyhedron = CreatePolyhedron(abstractPolyhedron, rootDownward).GetComponent<VisualPolyhedron>();
@@ -321,6 +344,8 @@ public class VisualPolyhedronFactory : MonoBehaviour
         //GameObject polyhedron = new GameObject();
 
         VisualPolyhedron visualPolyhedron = Instantiate<VisualPolyhedron>(VisualPolyhedronPrefab);
+        visualPolyhedron.enabled = true;
+        Debug.Log("Instantiated visual polyhedron");
         //VisualPolyhedron visualPolyhedron = polyhedron.AddComponent<VisualPolyhedron>();
         CreateFacesAndEdges(absPolyhedron, visualPolyhedron);
         if (rootDownward)

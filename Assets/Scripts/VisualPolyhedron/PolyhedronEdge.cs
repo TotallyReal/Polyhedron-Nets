@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: This is for generating polyhedrons in editor
+//       Find a better way of doing it
+[ExecuteInEditMode] 
 public class PolyhedronEdge : MonoBehaviour
 {
 

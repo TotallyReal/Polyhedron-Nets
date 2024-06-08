@@ -4,9 +4,15 @@ using UnityEngine;
 
 public class TempScript : MonoBehaviour
 {
+
+    private void Awake()
+    {
+        Debug.Log("Temp awake");
+    }
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("Temp start");
         NetsPlayerInput input = new NetsPlayerInput();
         input.Player.Enable();
         input.Player.Focus.performed += Focus_performed;

@@ -7,13 +7,13 @@ using static UnityEditor.IMGUI.Controls.PrimitiveBoundsHandle;
 public class WorldRotator : MonoBehaviour
 {
 
-    [SerializeField] private Transform cube;
+    [SerializeField] private Transform rotationObject;
 
     [SerializeField] private float rotationTimeSec = 1f;
     private bool isRotating;
     private NetsPlayerInput input;
 
-    struct RotationOp
+    public struct RotationOp
     {
         public RotationOp(Vector3 axis, float angle)
         {
@@ -30,15 +30,16 @@ public class WorldRotator : MonoBehaviour
 
     private List<RotationOp> axes;
 
-    void Awake()
+    public static List<RotationOp> GetRotationsFromPolyhedron(AbstractGroupPolyhedron groupPoly)
     {
-        AbstractGroupPolyhedron groupPoly = AbstractGroupPolyhedron.Cube(1);
-        axes = new List<RotationOp>();
+        List<RotationOp> axes = new List<RotationOp>();
+
         float verAngle = 360 / groupPoly.vertexDegree;
         foreach (var vertex in groupPoly.GetVertices())
         {
             axes.Add(new RotationOp(vertex, verAngle));
         }
+
         foreach (var face in groupPoly.GetFaces())
         {
             Vector3 center = Vector3.zero;
@@ -53,36 +54,47 @@ public class WorldRotator : MonoBehaviour
             axes.Add(new RotationOp(center, 360 / verCount));
         }
 
+        return axes;
+    }
 
+    void Awake()
+    {
         input = new NetsPlayerInput();
         input.Player.Enable();
+
+        SetRotationOp(GetRotationsFromPolyhedron(AbstractGroupPolyhedron.Cube(1)));
     }
+
+    public void SetRotationOp(List<RotationOp> rotations)
+    {
+        if (rotations != null)
+        {
+            axes = rotations;
+        }
+
+    }
+
+
+    #region -------------------- Action Event Rotation --------------------
 
     private void OnEnable()
     {
-        input.Player.RotateX.performed += RotateX;
-        input.Player.RotateY.performed += RotateY;
-        input.Player.RotateZ.performed += RotateZ;
-
         RaycastSelector.Instance.OnObjectPressedPlus += Rotate;
     }
 
     private void OnDisable()
     {
-        input.Player.RotateX.performed -= RotateX;
-        input.Player.RotateY.performed -= RotateY;
-        input.Player.RotateZ.performed -= RotateZ;
-
         RaycastSelector.Instance.OnObjectPressedPlus -= Rotate;
     }
 
     private void Rotate(object sender, (Transform, RaycastHit) e)
     {
-        if (e.Item1 == cube)
+        if (e.Item1 == rotationObject)
         {
             Vector3 dir = e.Item2.point - transform.position;
             dir.Normalize();
-            float dist = 10; // > 2
+
+            float dist = 1000; // > 2
             RotationOp closestRotOp = new RotationOp(Vector3.up, 0);
             foreach (RotationOp currentRotOp in axes) {
                 float d = Vector3.Distance(dir, currentRotOp.normalizedAxis);
@@ -93,11 +105,16 @@ public class WorldRotator : MonoBehaviour
                 }
             }
 
-            Debug.Log(dir);
-            Debug.Log(closestRotOp.normalizedAxis);
-            RotateAround(closestRotOp.normalizedAxis, closestRotOp.angle, 1);
+            //Debug.Log(dir);
+            //Debug.Log(closestRotOp.normalizedAxis);
+            RotateAround(closestRotOp.normalizedAxis, closestRotOp.angle, rotationTimeSec);
         }
     }
+
+    #endregion
+
+
+    #region -------------------- Rotation --------------------
 
     private void FinishedRotating()
     {
@@ -119,40 +136,6 @@ public class WorldRotator : MonoBehaviour
             .OnComplete(FinishedRotating);        
     }
 
-    private void RotateX(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-        if (isRotating) // TODO: Consider saving the action, and run it once the current action finishes.
-        {
-            return;
-        }
-        isRotating = true;
-        transform.DORotate(new Vector3(90, 0, 0), rotationTimeSec, RotateMode.WorldAxisAdd)
-            .OnComplete(FinishedRotating);
-        //transform.Rotate(90, 0, 0, Space.World);
-    }
-
-    private void RotateY(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-        if (isRotating)
-        {
-            return;
-        }
-        isRotating = true;
-        transform.DORotate(new Vector3(0, 90, 0), rotationTimeSec, RotateMode.WorldAxisAdd)
-            .OnComplete(FinishedRotating);
-        //transform.Rotate(0, 90, 0, Space.World);
-    }
-
-    private void RotateZ(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-        if (isRotating)
-        {
-            return;
-        }
-        isRotating = true;
-        transform.DORotate(new Vector3(0, 0, 90), rotationTimeSec, RotateMode.WorldAxisAdd)
-            .OnComplete(FinishedRotating);
-        //transform.Rotate(0, 0, 90, Space.World);
-    }
+    #endregion
 
 }
