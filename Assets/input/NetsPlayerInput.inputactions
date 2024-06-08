@@ -292,6 +292,14 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "NextStep",
+                    "type": "Button",
+                    "id": "64a45b9f-84c3-47cc-94a9-16d905139a99",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -393,6 +401,17 @@
                     "action": "Action",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "3390e797-2e6a-403b-95f3-d942869dc9d2",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "NextStep",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

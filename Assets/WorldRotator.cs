@@ -72,11 +72,7 @@ public class WorldRotator : MonoBehaviour
     private void Start()
     {
         if (factory != null) {
-            AbstractPolyhedron abstractPolyhedron = factory.GetAbstractPolyhedron();
-            if (abstractPolyhedron is AbstractGroupPolyhedron)
-            {
-                SetRotationOp(GetRotationsFromPolyhedron((AbstractGroupPolyhedron)abstractPolyhedron));
-            }
+            SetRotationOp(factory.GetRotations());
             factory.OnPolyhedroneGenerated += OnPolyhedroneGenerated;
         }
     }

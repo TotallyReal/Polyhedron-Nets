@@ -305,6 +305,14 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""NextStep"",
+                    ""type"": ""Button"",
+                    ""id"": ""64a45b9f-84c3-47cc-94a9-16d905139a99"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -406,6 +414,17 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                     ""action"": ""Action"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3390e797-2e6a-403b-95f3-d942869dc9d2"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""NextStep"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -430,6 +449,7 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
         m_Player_RotateZ = m_Player.FindAction("RotateZ", throwIfNotFound: true);
         m_Player_Focus = m_Player.FindAction("Focus", throwIfNotFound: true);
         m_Player_Action = m_Player.FindAction("Action", throwIfNotFound: true);
+        m_Player_NextStep = m_Player.FindAction("NextStep", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -576,6 +596,7 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_RotateZ;
     private readonly InputAction m_Player_Focus;
     private readonly InputAction m_Player_Action;
+    private readonly InputAction m_Player_NextStep;
     public struct PlayerActions
     {
         private @NetsPlayerInput m_Wrapper;
@@ -587,6 +608,7 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
         public InputAction @RotateZ => m_Wrapper.m_Player_RotateZ;
         public InputAction @Focus => m_Wrapper.m_Player_Focus;
         public InputAction @Action => m_Wrapper.m_Player_Action;
+        public InputAction @NextStep => m_Wrapper.m_Player_NextStep;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -617,6 +639,9 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                 @Action.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAction;
                 @Action.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAction;
                 @Action.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAction;
+                @NextStep.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNextStep;
+                @NextStep.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNextStep;
+                @NextStep.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNextStep;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -642,6 +667,9 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
                 @Action.started += instance.OnAction;
                 @Action.performed += instance.OnAction;
                 @Action.canceled += instance.OnAction;
+                @NextStep.started += instance.OnNextStep;
+                @NextStep.performed += instance.OnNextStep;
+                @NextStep.canceled += instance.OnNextStep;
             }
         }
     }
@@ -666,5 +694,6 @@ public class @NetsPlayerInput : IInputActionCollection, IDisposable
         void OnRotateZ(InputAction.CallbackContext context);
         void OnFocus(InputAction.CallbackContext context);
         void OnAction(InputAction.CallbackContext context);
+        void OnNextStep(InputAction.CallbackContext context);
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static WorldRotator;
 //using UnityEngine.ProBuilder;
 
 /// <summary>
@@ -162,6 +163,8 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [Header("Serialized polyhedron for editor")]
     private AbstractPolyhedron abstractPolyhedron;
     [SerializeField] private VisualPolyhedron visualPolyhedron = null;
+    // TODO: I hate everything about this
+    [SerializeField] private List<RotationOp> axes = null;
 
     /// <summary>
     /// Creates a new polyhedron, without destroying existing polyhedrons
@@ -207,7 +210,13 @@ public class VisualPolyhedronFactory : MonoBehaviour
         if (abstractPolyhedron is AbstractGroupPolyhedron)
         {
             OnPolyhedroneGenerated?.Invoke(this, (AbstractGroupPolyhedron)abstractPolyhedron);
+            axes = WorldRotator.GetRotationsFromPolyhedron((AbstractGroupPolyhedron)abstractPolyhedron);
         }
+    }
+
+    public List<WorldRotator.RotationOp> GetRotations()
+    {
+        return axes;
     }
 
     public void AddVertices()

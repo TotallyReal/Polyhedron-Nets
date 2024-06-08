@@ -13,6 +13,8 @@ using static UnityEditor.IMGUI.Controls.PrimitiveBoundsHandle;
 /// 1. A vertex stabilizer,
 /// 2. A face stabilizer.
 /// </summary>
+
+// TODO: This should be completely serializable. Should contain rotations axes.
 [System.Serializable]
 public class AbstractGroupPolyhedron : AbstractPolyhedron
 {
