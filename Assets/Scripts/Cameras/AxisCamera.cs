@@ -27,7 +27,7 @@ public class AxisCamera : MonoBehaviour
 
     private NetsPlayerInput input;
 
-    private void Start()
+    private void Awake()
     {
         input = new NetsPlayerInput();
         input.Camera.Enable();
@@ -41,7 +41,23 @@ public class AxisCamera : MonoBehaviour
         verAngle = Mathf.Atan2(lookAtDir.y, xzLength);
     }
 
-    private void Update()
+    private void OnEnable()
+    {
+        input.Camera.MouseZoom.performed += MouseZoom_performed;
+    }
+
+    private void OnDisable()
+    {
+        input.Camera.MouseZoom.performed -= MouseZoom_performed;
+    }
+
+    private void MouseZoom_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        float zoomValue = obj.ReadValue<float>()/120f;
+        UpdatePolarPosition(0, 0, -zoomValue * radialSpeed);
+    }
+
+    private void FixedUpdate()
     {
         Vector2 movement = input.Camera.Movement.ReadValue<Vector2>();
         float zoom = -input.Camera.Zoom.ReadValue<float>();
@@ -66,19 +82,5 @@ public class AxisCamera : MonoBehaviour
 
         transform.LookAt(lookAtTarget.transform);
     }
-    /*
-    public void TakeControl()
-    {
-        gameObject.SetActive(true);
-        mainCamera.gameObject.SetActive(false);
-        controller.gameObject.SetActive(false);
-    }
-
-    public void ReleaseControl()
-    {
-        mainCamera.gameObject.SetActive(true);
-        gameObject.SetActive(false);
-        controller.gameObject.SetActive(true);
-    }*/
 
 }

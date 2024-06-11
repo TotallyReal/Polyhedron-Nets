@@ -16,7 +16,6 @@ public class TempScript : MonoBehaviour
         NetsPlayerInput input = new NetsPlayerInput();
         input.Player.Enable();
         input.Player.Focus.performed += Focus_performed;
-        input.Player.RotateX.performed += RotateX_performed;
         input.Player.Action.performed += Action_performed;
         input.MouseSelection.Enable();
         input.MouseSelection.EdgeSelect.performed += EdgeSelect_performed;
@@ -32,10 +31,6 @@ public class TempScript : MonoBehaviour
         Debug.Log("edge select");
     }
 
-    private void RotateX_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-        Debug.Log("RotateX");
-    }
 
     private void Focus_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {

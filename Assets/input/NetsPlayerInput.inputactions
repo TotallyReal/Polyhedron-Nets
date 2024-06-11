@@ -50,9 +50,9 @@
                 },
                 {
                     "name": "Mouse Zoom",
-                    "type": "Value",
+                    "type": "PassThrough",
                     "id": "07419160-564f-4437-9bf3-9c5fdbd1ce20",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": ""
                 },
@@ -212,7 +212,7 @@
                 {
                     "name": "",
                     "id": "b815c2e2-d841-468d-96ee-46f8ee457ff3",
-                    "path": "<Mouse>/middleButton",
+                    "path": "<Mouse>/scroll/y",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -249,30 +249,6 @@
                     "name": "Restart",
                     "type": "Button",
                     "id": "6291e907-4b60-4c03-a4e3-bde9c4989196",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "RotateX",
-                    "type": "Button",
-                    "id": "39a121e2-f2b0-4eb2-abad-d9ba06332922",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "RotateY",
-                    "type": "Button",
-                    "id": "e5018d7f-968d-4122-9fbc-ad25067e297a",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "RotateZ",
-                    "type": "Button",
-                    "id": "9c12db34-e08f-49c7-9917-d82bc4c856b0",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -322,39 +298,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Restart",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "67cee928-3dac-4686-9eb9-f9ceff85899b",
-                    "path": "<Keyboard>/x",
-                    "interactions": "Press",
-                    "processors": "",
-                    "groups": "",
-                    "action": "RotateX",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "fbc5b884-d3d6-4087-8d79-4ebdeecda2d7",
-                    "path": "<Keyboard>/y",
-                    "interactions": "Press",
-                    "processors": "",
-                    "groups": "",
-                    "action": "RotateY",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "cb520cf9-8385-4d07-a63d-e95bed177f5b",
-                    "path": "<Keyboard>/z",
-                    "interactions": "Press",
-                    "processors": "",
-                    "groups": "",
-                    "action": "RotateZ",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

@@ -7,6 +7,7 @@ using static UnityEditor.IMGUI.Controls.PrimitiveBoundsHandle;
 public class WorldRotator : MonoBehaviour
 {
 
+    // TODO: Change it to rotatable object
     [SerializeField] private VisualPolyhedronFactory factory;
     [SerializeField] private Transform rotationObject;
 
