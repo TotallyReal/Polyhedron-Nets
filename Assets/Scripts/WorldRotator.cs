@@ -4,6 +4,10 @@ using UnityEngine;
 using DG.Tweening;
 using static UnityEditor.IMGUI.Controls.PrimitiveBoundsHandle;
 
+
+/// <summary>
+/// Whenever the rotation object is pressed, look for the closest rotation axis, and rotate around it.
+/// </summary>
 public class WorldRotator : MonoBehaviour
 {
 
@@ -12,6 +16,7 @@ public class WorldRotator : MonoBehaviour
     [SerializeField] private Transform rotationObject;
 
     [SerializeField] private float rotationTimeSec = 1f;
+    private RotationOp waitingRotation = null;
     private bool isRotating;
     private NetsPlayerInput input;
 
@@ -105,27 +110,29 @@ public class WorldRotator : MonoBehaviour
         RaycastSelector.Instance.OnObjectPressedPlus -= Rotate;
     }
 
+    private RotationOp ClosestRotation(Vector3 dir) {
+        dir.Normalize();
+
+        float dist = 1000; // > 2
+        RotationOp closestRotOp = new RotationOp(Vector3.up, 0);
+        foreach (RotationOp currentRotOp in axes)
+        {
+            float d = Vector3.Distance(dir, currentRotOp.normalizedAxis);
+            if (d < dist)
+            {
+                closestRotOp = currentRotOp;
+                dist = d;
+            }
+        }
+        return closestRotOp;
+    }
+
     private void Rotate(object sender, (Transform, RaycastHit) e)
     {
         if (e.Item1 == rotationObject)
         {
             Vector3 dir = e.Item2.point - transform.position;
-            dir.Normalize();
-
-            float dist = 1000; // > 2
-            RotationOp closestRotOp = new RotationOp(Vector3.up, 0);
-            foreach (RotationOp currentRotOp in axes) {
-                float d = Vector3.Distance(dir, currentRotOp.normalizedAxis);
-                if (d<dist)
-                {
-                    closestRotOp = currentRotOp;
-                    dist = d;
-                }
-            }
-
-            //Debug.Log(dir);
-            //Debug.Log(closestRotOp.normalizedAxis);
-            RotateAround(closestRotOp.normalizedAxis, closestRotOp.angle, rotationTimeSec);
+            RotateAround(ClosestRotation(dir), rotationTimeSec);
         }
     }
 
@@ -137,18 +144,29 @@ public class WorldRotator : MonoBehaviour
     private void FinishedRotating()
     {
         isRotating = false;
+        if (waitingRotation != null)
+        {
+            RotationOp nextRotation = waitingRotation;
+            waitingRotation = null;
+            RotateAround(nextRotation, rotationTimeSec);
+        }
     }
 
-    private void RotateAround(Vector3 axis, float angle, float rotationTimeSec)
+    private void RotateAround(RotationOp rotation, float rotationTimeSec)
     {
-        if (isRotating) // TODO: Consider saving the action, and run it once the current action finishes.
+        if (waitingRotation!=null)
         {
             return;
         }
-
-        Quaternion targetRotation = Quaternion.AngleAxis(angle, axis) * transform.rotation;
-
+        if (isRotating) // TODO: Consider saving the action, only if near the end of the previous action.
+        {
+            waitingRotation = rotation;
+            return;
+        }
         isRotating = true;
+
+        Quaternion targetRotation = Quaternion.AngleAxis(rotation.angle, rotation.normalizedAxis) * transform.rotation;
+
         transform.DORotateQuaternion(targetRotation, rotationTimeSec)
             .SetRelative(false)
             .OnComplete(FinishedRotating);        
