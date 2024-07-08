@@ -5,6 +5,11 @@ using UnityEngine;
 using UnityEngine.Assertions;
 
 
+// Implements several graph algorithms used in the game
+
+
+
+
 /// <summary>
 /// When running DFS and going over an edge e:v-&gt;u there are several possibilities
 /// <list type="number">
@@ -64,10 +69,11 @@ public class GraphAlgo<GraphNode, GraphEdge>
     #region ---------- DFS ----------
 
     /// <summary>
-    /// Called when DFS passes over edge: fromNode->toNode.
-    /// The position arguments are the order of node discovery along the DFS process.
-    /// Each node also has the smallest position it can reach, without going through its parent in the DFS process.
-    /// This smallest position is updated after each time returning from one of its children, or a discovered node. 
+    /// A callback method used in graph DFS when passing over an edge: fromNode->toNode.
+    ///   1. The position arguments are the order of node discovery along the DFS process.
+    ///   2. Each node also has the smallest position it can reach, without going through its parent in the DFS process.
+    ///      This smallest position is updated after each time returning from one of its children, or a discovered node. 
+    ///      
     /// More specifically, if u->v leads to a newly discovered node v, then it generates three callbacks:
     ///     1. FIRST_DISCOVER: when it is used for the first time
     ///     2. TO_PARENT:      when from v we use the opposite edge, and
@@ -75,14 +81,6 @@ public class GraphAlgo<GraphNode, GraphEdge>
     ///     After the callback for 3 is called, the smallest position for u is updated.
     /// If u->v leads to a nonparent discovered node v, then update the smallest position for u from the smallest reachable position from v.
     /// </summary>
-    /// <param name="fromNode"></param>
-    /// <param name="fromPosition"></param>
-    /// <param name="fromSmallestVisited"></param>
-    /// <param name="toNode"></param>
-    /// <param name="toPosition"></param>
-    /// <param name="toSmallestVisited"></param>
-    /// <param name="edge"></param>
-    /// <param name="travelType"></param>
     public delegate void EdgeTravel(
         GraphNode fromNode, int fromPosition, int fromSmallestVisited,
         GraphNode toNode, int toPosition, int toSmallestVisited,
@@ -278,7 +276,7 @@ public class GraphAlgo<GraphNode, GraphEdge>
     }
 
     /// <summary>
-    /// Find and returns all the "strongly connected components" in the connected component of the given root.
+    /// Finds and returns all the "strongly connected components" in the connected component of the given root.
     /// A connected component in this udirected graph is defined to be a maximal set of nodes such that each two nodes 
     /// belong to a simple cycle. Alternatively, an edge does not belong to two vertices in the same component if
     /// and only if removing it will cause the connected component of the root to become disconnected.

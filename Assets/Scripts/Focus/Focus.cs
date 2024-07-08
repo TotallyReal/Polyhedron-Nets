@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Attach to camera focus locations
+/// </summary>
 public abstract class Focus : MonoBehaviour 
 {
 

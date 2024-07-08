@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Gain focus when an object is double clicked. Lost it when double clicked again anywhere. 
+/// The given scripts and objects are enabled\disabled when gaining\losing focus.
+/// and disable them when focus is lost.
+/// </summary>
 public class FocusArea : Focus
 {
 
     [SerializeField] private Focus mainFocus;
     [SerializeField] private Transform clickObject;
+    [Header("Enable\\Disable when gaining\\losing focus")]
     [SerializeField] private List<MonoBehaviour> scripts;
     [SerializeField] private List<GameObject> objects;
 
@@ -24,6 +30,8 @@ public class FocusArea : Focus
         LoseFocus();
     }
 
+    #region ------------------- enable \ disable -------------------
+
     private void OnEnable()
     {
         input.Player.Focus.performed += DoubleClick;
@@ -34,13 +42,14 @@ public class FocusArea : Focus
         input.Player.Focus.performed -= DoubleClick;
     }
 
+    #endregion
+
     private bool isFocused = false;
 
     private void DoubleClick(InputAction.CallbackContext obj)
     {
         if (isFocused)
         {
-            isFocused = false;
             mainFocus.TakeFocusFrom(this);
         }
         else
@@ -48,7 +57,6 @@ public class FocusArea : Focus
             if (RaycastSelector.Instance.ObjectAtMousePosition(out Transform transform)
                 && transform == clickObject)
             {
-                isFocused = true;
                 TakeFocusFrom(mainFocus);
             }
         }
@@ -66,6 +74,7 @@ public class FocusArea : Focus
             obj.SetActive(false);
         }
 
+        isFocused = false;
         clickObject.gameObject.SetActive(true);
     }
 
@@ -80,6 +89,7 @@ public class FocusArea : Focus
             obj.SetActive(true);
         }
 
+        isFocused = true;
         clickObject.gameObject.SetActive(false);
     }
 }

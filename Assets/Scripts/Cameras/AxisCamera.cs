@@ -1,20 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
-using StarterAssets;
 
+
+/// <summary>
+/// Attach to a camera focused on a single point, where the player input is used to 
+/// rotate around it and zoom in\out.
+/// </summary>
 public class AxisCamera : MonoBehaviour
 {
 
-    //[SerializeField] private Camera mainCamera;
-    //[SerializeField] private FirstPersonController controller;
-
     [SerializeField] private GameObject lookAtTarget;
+
+    [Header("Movement speed")]
     [SerializeField] private float horizontalSpeed = 1f;
     [SerializeField] private float verticalSpeed = 1f;
     [SerializeField] private float radialSpeed = 1f;
 
+    [Header("Starting position")]
     [SerializeField] private float horAngle = 0;
     [SerializeField] private float verAngle = 0;
     [SerializeField] private float radius = 1;
@@ -32,14 +35,21 @@ public class AxisCamera : MonoBehaviour
         input = new NetsPlayerInput();
         input.Camera.Enable();
 
+        SetPositionFromTransform(); // TODO: maybe remove this line?
+    }
+
+    private void SetPositionFromTransform()
+    {
         Vector3 lookAtDir = transform.position - lookAtTarget.transform.position;
 
         radius = lookAtDir.magnitude;
-        
+
         horAngle = Mathf.Atan2(lookAtDir.z, lookAtDir.x);
         float xzLength = Mathf.Sqrt(lookAtDir.z * lookAtDir.z + lookAtDir.x * lookAtDir.x);
         verAngle = Mathf.Atan2(lookAtDir.y, xzLength);
     }
+
+    #region ------------------- enable \ disable -------------------
 
     private void OnEnable()
     {
@@ -50,6 +60,8 @@ public class AxisCamera : MonoBehaviour
     {
         input.Camera.MouseZoom.performed -= MouseZoom_performed;
     }
+
+    #endregion
 
     private void MouseZoom_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {

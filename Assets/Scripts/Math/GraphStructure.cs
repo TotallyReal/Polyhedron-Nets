@@ -1,55 +1,9 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using System.Linq;
 using Unity.VisualScripting;
-
-/// <summary>
-/// When running DFS and going over an edge e:v-&gt;u there are several possibilities
-/// <list type="number">
-/// <item>
-/// <description>For some reason, u is just null ...</description>
-/// </item>
-/// <item>
-/// <description>
-/// The edge leads back to the parent(namely, we used u-&gt;v to discover v).
-/// </description>
-/// </item>
-/// <item>
-/// <description>
-/// The edge leads to an already visited node (and in particular it is part of a simple cycle).
-/// </description>
-/// </item>
-/// <item>
-/// <description>
-/// This is the first time we discover u, and we haven't run the DFS on u
-/// </description>
-/// </item>
-/// <item>
-/// <description>
-/// This is the first time we discover u, and we have just finished running the DFS on u.
-/// </description>
-/// </item>
-/// </list>
-/// 
-/// <para>
-/// 0. For some reason, u is just null ...
-/// 1. The edge leads back to the parent(namely, we used u-&gt;v to discover v).
-/// 2. The edge leads to an already visited node (and in particular it is part of a simple cycle).
-/// 3. This is the first time we discover u, and we haven't run the DFS on u
-/// 4. This is the first time we discover u, and we have just finished running the DFS on u
-/// </para>
-/// </summary>
-/*public enum EdgeTravelType
-{
-    NULL,                   // edge leads to null node
-    FIRST_DISCOVER,         // edge leads to a newly discovered node
-    AFTER_DISCOVER,         // travelling back on an edge that led to a newly discovered node
-    TO_PARENT,              // edge leads to the parent (from which this current node was discovered)
-    ALREADY_DISCOVERED      // edge leads to an already discovered node
-}*/
 
 
 /// <summary>

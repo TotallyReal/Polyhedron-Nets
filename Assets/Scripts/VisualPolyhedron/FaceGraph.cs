@@ -25,6 +25,16 @@ public class FaceGraph : MonoBehaviour
             this.randomizeEdges = randomizeEdges;
         }
 
+        public bool AreEqual(Face node1, Face node2)
+        {
+            return node1 == node2;
+        }
+
+        public bool AreEqual(PolyhedronEdge edge1, PolyhedronEdge edge2)
+        {
+            return edge1 == edge2;
+        }
+
         public override IEnumerable<PolyhedronEdge> GetEdgesOf(Face node)
         {
             if (randomizeEdges)
