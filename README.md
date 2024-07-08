@@ -14,11 +14,11 @@ There are other nice polyhedrons which can be unfolded, and in particular the 5 
 
 I still need to think how to use this idea and actually create a game, but as usual, this is already a source of interesting mathematics, and I made a couple of videos about them:
 1. **Math and texture**: the mathematics of using 2d texture on 3d object.
-	a. [English version](https://youtu.be/K_BulUdx3CQ)
-	b. [Hebrew version](https://youtu.be/29cLQbvwLlc)
+	1. [English version](https://youtu.be/K_BulUdx3CQ)
+	2. [Hebrew version](https://youtu.be/29cLQbvwLlc)
 2. **Symmetries of polyhedrons**: Using symmetries to (easily...) construct the regular polyhedrons, and learning about their dual nature.
-	a. [English version](https://youtu.be/wQn7MA4Ew1k)
-	b. [Hebrew version](https://youtu.be/d6p7wBiWOno)
+	1. [English version](https://youtu.be/wQn7MA4Ew1k)
+	2. [Hebrew version](https://youtu.be/d6p7wBiWOno)
 
 In general, you can find more videos about other mathematical games I am develpoing in these youtube accounts.
 
