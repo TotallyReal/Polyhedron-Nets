@@ -3,12 +3,7 @@ using Complex = System.Numerics.Complex;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-using UnityEditor;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using System.Reflection;
 
 /// <summary>
 /// Used to model a finite isometry group of R^3 .
@@ -44,17 +39,26 @@ public class IsometryGroup : FiniteGroup<IsoElement>
         return group;
     }
 
-    public override IsoElement TryGet(IsoElement elem)
+    public override bool AreEqual(IsoElement elem1, IsoElement elem2)
+    {
+        // TODO: I am still not sure what is the best way to implement this.
+        //       As I am not using it right now, this is a job for future me.
+        throw new NotImplementedException();
+    }
+
+    public override bool TryGet(IsoElement elem, out IsoElement elemInGroup)
     {
         foreach (var element in this)
         {
             if (element.matrix.Equals(elem.matrix, ERROR))
             {
-                return element;
+                elemInGroup = element;
+                return true;
             }
         }
 
-        return null;
+        elemInGroup = Identity();
+        return false;
     }
 
     protected override IsoElement SimpleMultiply(IsoElement elem1, IsoElement elem2)
@@ -180,13 +184,20 @@ public class IsoElement
     private Vector3 axis;
     private bool flip;
 
-    public bool GetPresentation(out Vector3 axis/*, out float angle*/, out bool flip)
+    /// <summary>
+    /// Every isometry in R^3 is a composition of at most three reflections, and a nontrivial composition of two reflections
+    /// is always a rotation.
+    /// </summary>
+    /// <param name="axis"></param>
+    /// <param name="flip"></param>
+    /// <returns></returns>
+    public void GetPresentation(out Vector3 axis/*, out float angle*/, out bool flip)
     {
         if (represented)
         {
             axis = this.axis;
             flip = this.flip;
-            return true;
+            //return true;
         }
         Matrix<float> A = Matrix<float>.Build.DenseOfArray(new float[,]
         {
@@ -216,6 +227,8 @@ public class IsoElement
             eigenVectors.SetColumn(0, eigenVectors.Column(index));
             eigenVectors.SetColumn(index, tempEVector);
 
+            // The other two eigenvalues multiple to 1 and have norm 1, so they must be conjugated, hence, 
+            // this is a rotation.
             flip = false;
             /*// is a rotation
             eigenValues.Where(z => { return (z - Complex.One).Magnitude < IsometryGroup.ERROR; });
@@ -231,7 +244,7 @@ public class IsoElement
             }*/
         } else
         {
-            // is a reflection + rotation
+            // is a reflection + rotation (possibly by zero degrees)
             int index = FirstIndex(eigenValues, z => AlmostEqual(z, -Complex.One, IsometryGroup.ERROR));
 
             Complex tempEValue = eigenValues[0];
@@ -266,7 +279,7 @@ public class IsoElement
         this.axis = axis;
         this.flip = flip;
         this.represented = true;
-        return true;
+        //return true;
     }
 
 }

@@ -4,12 +4,14 @@ using System.Linq;
 using System.Security.Principal;
 using UnityEngine;
 
-abstract public class Group<Element> : IEnumerable<Element> where Element : class
+abstract public class Group<Element> : IEnumerable<Element>
 {
 
     abstract public Element Identity();
 
     abstract public bool Contains(Element elem);
+
+    abstract public bool AreEqual(Element elem1, Element elem2);
 
     abstract public Element Multiply(Element elem1, Element elem2);
 
@@ -27,12 +29,12 @@ abstract public class Group<Element> : IEnumerable<Element> where Element : clas
 
 
 /// <summary>
-/// Using a finite multiplication table to implement the group structure
+/// Using a finite multiplication table to implement the group structure.
 /// </summary>
 /// <typeparam name="Element"></typeparam>
-abstract public class FiniteGroup<Element> : Group<Element> where Element : class
+abstract public class FiniteGroup<Element> : Group<Element>
 {
-    private readonly HashSet<Element> groupElements;
+    private readonly HashSet<Element> groupElements; // TODO: check what is the hash of a general "ELEMENT".
     private readonly Dictionary<(Element, Element), Element> multiplication;
     private readonly Dictionary<Element, Element> inverseOf;
     private readonly Element identity;
@@ -80,11 +82,12 @@ abstract public class FiniteGroup<Element> : Group<Element> where Element : clas
     }
 
     /// <summary>
-    /// Try to find if the group already contains an "equivalent" element, and if so returns it.
+    /// Try to find if the group already contains an "equivalent" element. If so returns true and the equivalent element
+    /// in the out parameter. Otherwise returns false.
     /// </summary>
     /// <param name="elem"></param>
     /// <returns></returns>
-    public abstract Element TryGet(Element elem);
+    public abstract bool TryGet(Element elem, out Element elemInGroup);
 
     /// <summary>
     /// Tries to add the given element to this group, and returns it. Might return a different (but equivalent) element
@@ -93,9 +96,8 @@ abstract public class FiniteGroup<Element> : Group<Element> where Element : clas
     /// <param name="elem">The element to add to the group</param>
     /// <returns>The element added to the group</returns>
     public Element AddElement(Element elem)
-    {
-        Element element = TryGet(elem);
-        if (element != null)
+    {        
+        if (TryGet(elem, out Element element))
             return element;
 
         groupElements.Add(elem);
@@ -128,8 +130,9 @@ abstract public class FiniteGroup<Element> : Group<Element> where Element : clas
     {
         if (!Contains(elem1) || !Contains(elem2))
         {
-            Debug.LogError("Trying to multiply elements which doo not belong to this group");
-            return null;
+            Debug.LogError("Trying to multiply elements which do not belong to this group");
+            throw new System.Exception("Trying to multiply elements which do not belong to this group");
+            // return null;  // TODO: check if there is a reason I put here return null instead of exception
         }
         if (multiplication.TryGetValue((elem1, elem2), out Element result))
         {
@@ -154,7 +157,8 @@ abstract public class FiniteGroup<Element> : Group<Element> where Element : clas
         if (!Contains(elem))
         {
             Debug.LogError($"The group does not contain the element {elem}");
-            return null;
+            throw new System.Exception($"The group does not contain the element {elem}");
+            // return null;  // TODO: check if there is a reason I put here return null instead of exception
         }
 
         if (inverseOf.TryGetValue(elem, out Element elemInverse))
@@ -169,7 +173,7 @@ abstract public class FiniteGroup<Element> : Group<Element> where Element : clas
         List<Element> elementPowers = new List<Element>();
         Element lastElement = elem;
         int lastElementOrder;
-        Element lastElementInverse = null;
+        Element lastElementInverse = identity;
         for (lastElementOrder=1; lastElementOrder < MAX_ITERATIONS; lastElementOrder++)
         {
             if (inverseOf.TryGetValue(lastElement, out lastElementInverse))
@@ -182,8 +186,9 @@ abstract public class FiniteGroup<Element> : Group<Element> where Element : clas
         if (lastElementOrder == MAX_ITERATIONS)
         {
             Debug.LogError($"The element {elem} order is too large");
-            return null;
-        }           
+            throw new System.Exception($"The element {elem} order is too large");
+            // return null;  // TODO: check if there is a reason I put here return null instead of exception
+        }
 
         elementPowers.Reverse();
 
@@ -235,6 +240,7 @@ abstract public class FiniteGroup<Element> : Group<Element> where Element : clas
             nextSphere = new List<Element>();
         }
 
+        // TODO: how do I make sure that the subgroup of this finite group is also finite?
         return new Subgroup<Element>(this, subgroup.Contains);
     }
 
@@ -252,39 +258,41 @@ abstract public class FiniteGroup<Element> : Group<Element> where Element : clas
         HashSet<Element> representatives = new HashSet<Element>(); // TODO consider adding a comparator based on the group
         foreach (Element element in this)
         {
-            if (FindCosetRepresentative(element, representatives, subgroup) == null)
+            if (!TryFindCosetRepresentative(element, representatives, subgroup, out Element g))
                 representatives.Add(element);
         }
         return representatives;
     }
 
     /// <summary>
-    /// Looks for a represntative g such that element*subgroup == g*subgroup.
+    /// Looks for a represntative g from the given list such that element*subgroup == g*subgroup.
     /// </summary>
     /// <param name="element"></param>
     /// <param name="cosetsRep"></param>
     /// <param name="subgroup"></param>
     /// <returns></returns>
-    public Element FindCosetRepresentative(
-        Element element, IEnumerable<Element> cosetsRep, Group<Element> subgroup)
+    public bool TryFindCosetRepresentative(
+        Element element, IEnumerable<Element> cosetsRep, Group<Element> subgroup, out Element g)
     {
-        if (element == null)
-            return element;
+        //if (element == null)
+        //    return element;
+        g = Identity();
         Element inverseElement = Inverse(element);
         foreach (var representative in cosetsRep)
         {
             if (subgroup.Contains(Multiply(inverseElement, representative)))
             {
-                return representative;
+                g = representative;
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     #endregion
 }
 
-public class Subgroup<Element> : Group<Element> where Element : class
+public class Subgroup<Element> : Group<Element>
 {
 
     public delegate bool ContainsElement(Element elem);
@@ -306,6 +314,11 @@ public class Subgroup<Element> : Group<Element> where Element : class
     public override bool Contains(Element elem)
     {
         return filter(elem); // TODO - should we check if it is in the containing group, or assume that it is part of the filter?
+    }
+
+    public override bool AreEqual(Element elem1, Element elem2)
+    {
+        return this.containingGroup.AreEqual(elem1, elem2);
     }
 
     public override IEnumerable<Element> CosetRepresentatives(Group<Element> subgroup)
@@ -344,24 +357,24 @@ public class Subgroup<Element> : Group<Element> where Element : class
 
 public FiniteSubgroup(FiniteGroup<Element> containingGroup)
 {
-   this.containingGroup = containingGroup;
+this.containingGroup = containingGroup;
 }
 
 public override Element TryGet(Element elem)
 {
-   Element element = containingGroup.TryGet(elem);
-   if (Contains(element))
-       return element;
-   return null;
+Element element = containingGroup.TryGet(elem);
+if (Contains(element))
+  return element;
+return null;
 }
 
 protected override Element CreateIdentity()
 {
-   return containingGroup.Identity();
+return containingGroup.Identity();
 }
 
 protected override Element SimpleMultiply(Element elem1, Element elem2)
 {
-   return containingGroup.Multiply(elem1, elem2); // TODO - is this how I want to do it?
+return containingGroup.Multiply(elem1, elem2); // TODO - is this how I want to do it?
 }*/
 }

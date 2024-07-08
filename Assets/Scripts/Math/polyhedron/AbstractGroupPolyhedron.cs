@@ -166,7 +166,8 @@ public class AbstractGroupPolyhedron : AbstractPolyhedron
             List<int> faceVertexIndices = new List<int>();
             foreach (var elem in orderedStabilizer)
             {
-                IsoElement verRep = group.FindCosetRepresentative(faceCoset * elem, verCosets, verStabilizer);
+                group.TryFindCosetRepresentative(faceCoset * elem, verCosets, verStabilizer, out IsoElement verRep);
+                //IsoElement verRep = group.TryFindCosetRepresentative(faceCoset * elem, verCosets, verStabilizer);
                 if (!cosetRepToIndex.TryGetValue(verRep, out int index))
                 {
                     Debug.Log("You should not be here");
@@ -241,7 +242,7 @@ public class AbstractGroupPolyhedron : AbstractPolyhedron
             List<int> faceVertexIndices = new List<int>();
             foreach (var elem in faceStabilizer)
             {
-                IsoElement verRep = group.FindCosetRepresentative(faceCoset * elem, verCosets, verStabilizer);
+                IsoElement verRep = group.TryFindCosetRepresentative(faceCoset * elem, verCosets, verStabilizer);
                 if (!cosetRepToIndex.TryGetValue(verRep, out int index))
                 {
                     Debug.Log("You should not be here");
