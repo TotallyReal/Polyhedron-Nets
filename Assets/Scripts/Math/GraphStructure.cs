@@ -6,6 +6,9 @@ using System.Linq;
 using Unity.VisualScripting;
 
 
+// TODO: Delete this file once I am sure everything move on correctly to the LocalGraph and GraphAlgo files.
+
+
 /// <summary>
 /// Implement this class to run a DFS search on the graph.
 /// The "GraphNode" elements should be able to return the edges connecting to them (GetEdgesOf),

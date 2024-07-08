@@ -7,7 +7,7 @@ using TMPro.EditorUtilities;
 using Unity.VisualScripting;
 using UnityEngine;
 //using static GraphStructure<GraphNode, GraphEdge>;
-using DirectedEdge = GraphStructure<Face, PolyhedronEdge>.DirectedEdge;
+using DirectedEdge = GraphAlgo<Face, PolyhedronEdge>.DirectedEdge;
 
 public class FaceGraph : MonoBehaviour
 {    
@@ -16,7 +16,7 @@ public class FaceGraph : MonoBehaviour
     // TODO : add list of edges
     //public bool runButton = false;
 
-    class FaceGraphStructure : GraphStructure<Face, PolyhedronEdge>
+    class FaceGraphStructure : LocalGraph<Face, PolyhedronEdge>
     {
         private bool randomizeEdges;
 
@@ -25,12 +25,12 @@ public class FaceGraph : MonoBehaviour
             this.randomizeEdges = randomizeEdges;
         }
 
-        public bool AreEqual(Face node1, Face node2)
+        public override bool AreEqual(Face node1, Face node2)
         {
             return node1 == node2;
         }
 
-        public bool AreEqual(PolyhedronEdge edge1, PolyhedronEdge edge2)
+        public override bool AreEqual(PolyhedronEdge edge1, PolyhedronEdge edge2)
         {
             return edge1 == edge2;
         }
@@ -60,10 +60,12 @@ public class FaceGraph : MonoBehaviour
     }
 
     private FaceGraphStructure dfsGraph;
+    private GraphAlgo<Face, PolyhedronEdge> graphAlgo;
 
     private void Awake()
     {
         dfsGraph = new FaceGraphStructure();
+        graphAlgo = new GraphAlgo<Face, PolyhedronEdge>(dfsGraph);
     }
 
 
@@ -102,7 +104,8 @@ public class FaceGraph : MonoBehaviour
         // Run a DFS algorithm on the faces as nodes, where we start at the root and two faces are connected in the graph
         // when there is an edge connecting them.
         // The returned list of edges contains the information of whether the edge is part of a cycle or not.
-        List<DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(rootFace);
+        //List<DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(rootFace);
+        List<DirectedEdge> directedEdges = graphAlgo.GetDirectedEdgesDFS(rootFace);
 
         // check if the graph is connected (tree edges = #nodes - 1)
         if (!IsFullTree(directedEdges))
@@ -124,7 +127,8 @@ public class FaceGraph : MonoBehaviour
         // Run a DFS algorithm on the faces as nodes, where we start at the root and two faces are connected in the graph
         // when there is an edge connecting them.
         // The returned list of edges contains the information of whether the edge is part of a cycle or not.
-        List<DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(rootFace);
+        //List<DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(rootFace);
+        List<DirectedEdge> directedEdges = graphAlgo.GetDirectedEdgesDFS(rootFace);
 
         // Count the edges which are not part of the spanning tree and do not lead to 
         // a null node.
@@ -134,7 +138,8 @@ public class FaceGraph : MonoBehaviour
 
     public void CreateRandomGraph()
     {
-        IEnumerable<DirectedEdge> directedEdges = dfsGraph.RandomDirectedTree(rootFace);
+        //IEnumerable<DirectedEdge> directedEdges = dfsGraph.RandomDirectedTree(rootFace);
+        IEnumerable<DirectedEdge> directedEdges = graphAlgo.RandomDirectedTree(rootFace);
         SetParentFromDirectedEdges(directedEdges);
 
         //IEnumerable<DirectedEdge> directedEdges = CreateInitialGraph();
@@ -157,7 +162,8 @@ public class FaceGraph : MonoBehaviour
         if (directedEdges == null)
             return;
 
-        Dictionary<Face, int> componentOf = dfsGraph.GetStronglyConnectedComponents(rootFace);
+        // Dictionary<Face, int> componentOf = dfsGraph.GetStronglyConnectedComponents(rootFace);
+        Dictionary<Face, int> componentOf = graphAlgo.GetStronglyConnectedComponents(rootFace);
         foreach (DirectedEdge directedEdge in directedEdges)
         {
             //directedEdge.edge.transform.parent = directedEdge.parent.transform;
@@ -215,8 +221,10 @@ public class FaceGraph : MonoBehaviour
 
     public bool CompareTo(FaceGraph other)
     {
-        List<DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(rootFace);
-        List<DirectedEdge> otherDirectedEdges = dfsGraph.GetDirectedEdgesDFS(other.rootFace);
+        //List<DirectedEdge> directedEdges = dfsGraph.GetDirectedEdgesDFS(rootFace);
+        //List<DirectedEdge> otherDirectedEdges = dfsGraph.GetDirectedEdgesDFS(other.rootFace);
+        List<DirectedEdge> directedEdges = graphAlgo.GetDirectedEdgesDFS(rootFace);
+        List<DirectedEdge> otherDirectedEdges = graphAlgo.GetDirectedEdgesDFS(other.rootFace);
 
         List<(int, int)> numberedEdges = (
             from directedEdge in directedEdges

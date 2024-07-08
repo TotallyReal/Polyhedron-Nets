@@ -62,6 +62,7 @@ public class GraphAlgo<GraphNode, GraphEdge>
 
     public GraphAlgo(LocalGraph<GraphNode, GraphEdge> graph)
     {
+        // TODO: change the methods to have the graph as a parameter, or make them extensions to local graph.
         Assert.IsNotNull(graph);
         this.graph = graph;
     }
@@ -320,5 +321,158 @@ public class GraphAlgo<GraphNode, GraphEdge>
 
         DFS(root, ComponentEdgeTravel);
         return componentIndex;
+    }
+
+
+    /// <summary>
+    /// Creates a random spanning tree for the connected component containing the given root.
+    /// </summary>
+    /// <param name="root"></param>
+    public List<DirectedEdge> RandomDirectedTree(GraphNode root)
+    {
+        List<DirectedEdge> directedEdges = GetDirectedEdgesDFS(root);
+
+        IEnumerable<DirectedEdge> allEdges = from directedEdge in directedEdges
+                                             where directedEdge.child != null
+                                             select directedEdge;
+        allEdges = MathTools.RandomList(new List<DirectedEdge>(allEdges));
+
+        // Create a random tree by going over the edges (randomly) and form connected components.
+        // Any edge that connects two distinct components, will become a tree edge.
+        // We keep track over the component using the graph described by
+        //      (1) firstComponent: which gives each node an initial component index, and
+        //      (2) nextComponent: which keeps the parentIndex of each childIndex.
+        // Two nodes are in the same componet, if they have the same first ancestor.
+        List<DirectedEdge> newDirectedEdges = new List<DirectedEdge>();
+        List<GraphEdge> edges = new List<GraphEdge>();
+
+        Dictionary<GraphNode, int> firstComponent =
+            new Dictionary<GraphNode, int> { { root, 0 } };
+        int componentIndex = 1;
+        Dictionary<int, int> nextComponent = new Dictionary<int, int>();
+        int GetComponent(GraphNode node)
+        {
+            if (firstComponent.TryGetValue(node, out int index))
+            {
+                int initialIndex = index;
+                while (nextComponent.TryGetValue(index, out int nextIndex))
+                {
+                    if (nextIndex == initialIndex)
+                    {
+                        Debug.LogError("Found a loop in the component graph");
+                        return -1;
+                    }
+                    index = nextIndex;
+                }
+                return index;
+            }
+            // Haven't seen this node yet. Start a new component.
+            firstComponent.Add(node, componentIndex);
+            componentIndex++;
+            return componentIndex - 1;
+        }
+        foreach (DirectedEdge directedEdge in allEdges)
+        {
+            int parentIndex = GetComponent(directedEdge.parent);
+            int childIndex = GetComponent(directedEdge.child);
+            DirectedEdge newDirectedEdge = directedEdge; // copy struct
+            newDirectedEdge.seperatorEdge = false;       // irrelevant here
+            if (parentIndex != childIndex)
+            {
+                newDirectedEdge.treeEdge = true;
+                nextComponent.Add(childIndex, parentIndex);
+                edges.Add(newDirectedEdge.edge);
+            }
+            else
+            {
+                newDirectedEdge.treeEdge = false;
+            }
+            newDirectedEdges.Add(newDirectedEdge);
+        }
+
+        allEdges = newDirectedEdges;
+
+        // now that we have all the edges in the spanning tree, we need to choose
+        // their directions to create a directed tree.
+        LocalSubgraph<GraphNode, GraphEdge> subgraph =
+            new LocalSubgraph<GraphNode, GraphEdge>(graph, edge => edges.Contains(edge));
+
+        Dictionary<GraphNode, int> nodeIndices =
+            new Dictionary<GraphNode, int> { { root, 0 } };
+        int nodeIndex = 1;
+        void TrackNodeDiscovery(
+            GraphNode fromNode, int fromPosition, int fromSmallestVisited,
+            GraphNode toNode, int toPosition, int toSmallestVisited,
+            GraphEdge edge, EdgeTravelType travelType)
+        {
+            if (travelType == EdgeTravelType.FIRST_DISCOVER)
+            {
+                nodeIndices.Add(toNode, nodeIndex);
+                nodeIndex++;
+            }
+        }
+
+        new GraphAlgo<GraphNode, GraphEdge>(subgraph).DFS(root, TrackNodeDiscovery);
+
+        newDirectedEdges = new List<DirectedEdge>();
+        foreach (var directedEdge in allEdges)
+        {
+            int parentIndex = nodeIndices[directedEdge.parent];
+            int childIndex = nodeIndices[directedEdge.child];
+            if (childIndex < parentIndex)
+            {
+                DirectedEdge newDirectedEdge = directedEdge;
+                newDirectedEdge.parent = directedEdge.child;
+                newDirectedEdge.child = directedEdge.parent;
+                newDirectedEdges.Add(newDirectedEdge);
+            }
+            else
+            {
+                newDirectedEdges.Add(directedEdge);
+            }
+        }
+
+        return newDirectedEdges;
+
+    }
+}
+
+
+public class LocalSubgraph<GraphNode, GraphEdge> : LocalGraph<GraphNode, GraphEdge>
+{
+    public delegate bool ContainsEdge(GraphEdge edge);
+
+    private readonly LocalGraph<GraphNode, GraphEdge> graph;
+    private readonly ContainsEdge filter;
+
+    public LocalSubgraph(LocalGraph<GraphNode, GraphEdge> graph, ContainsEdge filter)
+    {
+        this.graph = graph;
+        this.filter = filter;
+    }
+
+    public override IEnumerable<GraphEdge> GetEdgesOf(GraphNode node)
+    {
+        return graph.GetEdgesOf(node).Where(edge => filter(edge));
+    }
+
+    public override GraphNode GetNode1Of(GraphEdge edge)
+    {
+        return graph.GetNode1Of(edge);
+    }
+
+    public override GraphNode GetNode2Of(GraphEdge edge)
+    {
+        return graph.GetNode2Of(edge);
+    }
+
+    public override bool AreEqual(GraphNode node1, GraphNode node2)
+    {
+        return graph.AreEqual(node1, node2);
+    }
+
+    public override bool AreEqual(GraphEdge edge1, GraphEdge edge2)
+    {
+        return graph.AreEqual(edge1, edge2);
     }
 }
