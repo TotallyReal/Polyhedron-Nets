@@ -1,0 +1,6 @@
+Extra Assets:
+
+1. Lowly Poly - Free Stylized Textures
+2. MathNet Numerics 5.0.0
+3. Unity Starter Assets
+4. TextMesh Pro
