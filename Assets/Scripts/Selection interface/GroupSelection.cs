@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
+
+// TODO: Go back to the main scene and see how I used this file
 public class GroupSelection : MonoBehaviour
 {
 
@@ -26,9 +29,14 @@ public class GroupSelection : MonoBehaviour
         selectionGroups = new Dictionary<Transform, OnSelected>();
     }
 
-    private void Start()
+    private void OnEnable()
     {
         RaycastSelector.Instance.OnObjectPressed += OnObjectPressed;
+    }
+
+    private void OnDisable()
+    {
+        RaycastSelector.Instance.OnObjectPressed -= OnObjectPressed;
     }
 
 

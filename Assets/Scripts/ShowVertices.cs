@@ -41,9 +41,4 @@ public class ShowVertices : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
