@@ -1,5 +1,5 @@
 # A game about unfoldings
-<p align="center"><img src="thumbnail.PNG" alt="platonic solids" width="600"/></p>
+<p align="center"><img src="dodecahedron-unfold.gif" alt="unfolding" width="600"/></p>
 
 
 This is one of the games I am creating in my journey to learn game developement, and of course mix it with mathematics.
@@ -10,7 +10,8 @@ You should have in mind a standard cube made of paper, where you are allowed to 
 
 <p align="center"><img src="cube_nets.jpg" alt="cube nets" width="200" /></p>
 
-There are other nice polyhedrons which can be unfolded, and in particular the 5 [platonic solids](https://en.wikipedia.org/wiki/Platonic_solid) as in the image above (generated from the game). 
+There are other nice polyhedrons which can be unfolded, and in particular the 5 [platonic solids](https://en.wikipedia.org/wiki/Platonic_solid) as in the following (generated from the game). 
+<p align="center"><img src="thumbnail.PNG" alt="platonic solids" width="600"/></p>
 
 I still need to think how to use this idea and actually create a game, but as usual, this is already a source of interesting mathematics, and I made a couple of videos about them:
 1. **Math and texture**: the mathematics of using 2d texture on 3d object.
