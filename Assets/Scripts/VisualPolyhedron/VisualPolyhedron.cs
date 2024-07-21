@@ -9,6 +9,7 @@ using UnityEngine;
 public class VisualPolyhedron : MonoBehaviour
 {
 
+    [SerializeField] private VisualPolyhedronProperties visualProperties;
     [SerializeField] private Material faceMaterial;
     [SerializeField] private Material edgeMaterial;
 
@@ -51,6 +52,25 @@ public class VisualPolyhedron : MonoBehaviour
     public FaceGraph GetFaceGraph()
     {
         return faceGraph;
+    }
+
+    public void SetVisualProperties(VisualPolyhedronProperties visualProperties) {
+        if (visualProperties == null)
+            return;
+
+        this.visualProperties = visualProperties;
+
+        // faces :
+        SetFaceMaterial(visualProperties.faceMaterial);
+        RootFace.SetMaterial(visualProperties.rootMaterial);
+
+        // edges :
+        SetEdgeMaterial(visualProperties.edgeMaterial);
+        foreach (var edge in edges)
+        {
+            edge.SetRadius(visualProperties.edgeRadius);
+            edge.SetVisible(visualProperties.showEdges);
+        }
     }
 
     #region --------------------- faces ---------------------

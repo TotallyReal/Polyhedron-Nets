@@ -15,7 +15,8 @@ public class PolyhedronKeyboardInput : MonoBehaviour
     public event EventHandler OnRestart;
 
     private VisualPolyhedronFactory visualPolyhedronFactory;
-    
+    [SerializeField] private VisualPolyhedron visualPolyhedronObj = null;
+
 
     // Start is called before the first frame update
     void Awake()
@@ -40,7 +41,9 @@ public class PolyhedronKeyboardInput : MonoBehaviour
 
     private void CreateGraph(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        VisualPolyhedron visualPolyhedron = visualPolyhedronFactory.GetVisualPolyhedron();
+        VisualPolyhedron visualPolyhedron = visualPolyhedronObj;
+        if (visualPolyhedron == null)
+            visualPolyhedron = visualPolyhedronFactory.GetVisualPolyhedron();
         if (visualPolyhedron != null)
         {
             FaceGraph faceGraph = visualPolyhedron.GetComponent<FaceGraph>();

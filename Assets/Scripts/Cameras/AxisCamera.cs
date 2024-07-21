@@ -35,10 +35,10 @@ public class AxisCamera : MonoBehaviour
         input = new NetsPlayerInput();
         input.Camera.Enable();
 
-        SetPositionFromTransform(); // TODO: maybe remove this line?
+        //SetPositionFromTransform(); // TODO: maybe remove this line?
     }
 
-    private void SetPositionFromTransform()
+    public void SetPositionFromTransform()
     {
         Vector3 lookAtDir = transform.position - lookAtTarget.transform.position;
 

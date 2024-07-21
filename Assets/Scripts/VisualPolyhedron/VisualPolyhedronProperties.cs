@@ -6,18 +6,15 @@ using UnityEngine;
 public class VisualPolyhedronProperties : ScriptableObject
 {
     [Header("Faces")]
-    [SerializeField] private FaceMesh facePrefab;
-    [SerializeField] private float faceRadius = 5;
-    [SerializeField] private Material faceMaterial;
-    [SerializeField] private Material rootMaterial;
+    [SerializeField] public float faceRadius = 1;
+    [SerializeField] public Material faceMaterial;
+    [SerializeField] public Material rootMaterial;
     [Header("Edges")]
-    [SerializeField] private PolyhedronEdge axisPrefab;
-    [SerializeField] private float edgeRadius = 0.5f;
-    [SerializeField] private bool showEdges = true;
-    [SerializeField] private Material edgeMaterial;
+    [SerializeField] public float edgeRadius = 0.1f;
+    [SerializeField] public bool showEdges = true;
+    [SerializeField] public Material edgeMaterial;
     [Header("Numbers")]
-    [SerializeField] private NumberedCanvas numberedCanvasPrefab;
-    [SerializeField] private float numberRadius = 2;
-    [SerializeField] private bool showNumbers = false;
-    [SerializeField] private float numberLabelDistance = 0.003f;
+    [SerializeField] public float numberRadius = 2;
+    [SerializeField] public bool showNumbers = false;
+    [SerializeField] public float numberLabelDistance = 0.003f;
 }

@@ -14,9 +14,11 @@ public class PolyhedronEdge : MonoBehaviour
     [SerializeField] private Transform visual;
 
     private MouseTarget target;
-    private float anglePerSecond = 125f;
+    private float anglePerSecond = 50; //125f;
 
     private RotationAxis rotationAxis;
+
+    private float length = 0f;
 
     void Awake()
     {
@@ -151,10 +153,18 @@ public class PolyhedronEdge : MonoBehaviour
         transform.position = Vector3.Lerp(from, to, 0.5f);
         Vector3 dir = from - to;
         MathTools.RotateToMatch(transform, transform.up, dir);
+        length = dir.magnitude;
 
-        visual.transform.localScale = new Vector3(radius, dir.magnitude / 2, radius);
+        SetRadius(radius);
+        //visual.transform.localScale = new Vector3(radius, dir.magnitude / 2, radius);
 
         rotationAxis.SetAxis(from, to);
+    }
+
+    public void SetRadius(float radius)
+    {
+        visual.transform.localScale = new Vector3(radius, length / 2, radius);
+
     }
 
     public void SetMaterial(Material material)
