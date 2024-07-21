@@ -9,7 +9,7 @@ using UnityEngine;
 /// </summary>
 public class AxisCamera : MonoBehaviour
 {
-
+    
     [SerializeField] private GameObject lookAtTarget;
 
     [Header("Movement speed")]

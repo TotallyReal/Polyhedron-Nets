@@ -1,10 +1,11 @@
 {
-    "name": "MathTests",
+    "name": "tests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "NewAssembly"
+        "NewAssembly",
+        "totallyreal.polyhedrons"
     ],
     "includePlatforms": [
         "Editor"

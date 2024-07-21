@@ -16,9 +16,7 @@ public class WorldRotator : MonoBehaviour
     [SerializeField] private Transform rotationObject;
 
     [SerializeField] private float rotationTimeSec = 1f;
-    private RotationOp waitingRotation = null;
     private bool isRotating;
-    private NetsPlayerInput input;
 
     // TODO: Finally..........
     [System.Serializable]
@@ -69,9 +67,6 @@ public class WorldRotator : MonoBehaviour
 
     void Awake()
     {
-        input = new NetsPlayerInput();
-        input.Player.Enable();
-
         SetRotationOp(GetRotationsFromPolyhedron(AbstractGroupPolyhedron.Cube(1)));
     }
 
@@ -140,6 +135,9 @@ public class WorldRotator : MonoBehaviour
 
 
     #region -------------------- Rotation --------------------
+
+
+    private RotationOp waitingRotation = null;
 
     private void FinishedRotating()
     {

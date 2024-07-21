@@ -7,12 +7,6 @@
       "dependencies": {},
       "hash": "e6f3f800b03f1b880fa6f3a6c70cedcc2eef393a"
     },
-    "com.totallyreal.polyhedrons": {
-      "version": "file:Polyhedrons",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
