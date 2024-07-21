@@ -1,0 +1,22 @@
+{
+  "name": "com.totallyreal.polyhedrons",
+  "version": "1.0.0",
+  "displayName": "Polyhedrons",
+  "description": "Used to create 3d Platonic solids, which can be unfolded",
+  "unity": "2021.1",
+  "unityRelease": "0b5",
+  "documentationUrl": "https://example.com/",
+  "changelogUrl": "https://example.com/changelog.html",
+  "licensesUrl": "https://example.com/licensing.html",
+  "keywords": [
+    "Polyhedrons",
+    "Math",
+    "3d"
+  ],
+  "author": {
+    "name": "Ofir",
+    "email": "TotallyReal@gmail.com",
+    "url": "https://www.unity3d.com"
+  },
+  "type": "library"
+}
