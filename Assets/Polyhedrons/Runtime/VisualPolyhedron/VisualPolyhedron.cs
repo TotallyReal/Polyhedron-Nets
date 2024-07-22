@@ -66,6 +66,7 @@ public class VisualPolyhedron : MonoBehaviour
 
         // edges :
         SetEdgeMaterial(visualProperties.edgeMaterial);
+        SetSelectedEdgeMaterial(visualProperties.selectedEdgeMaterial);
         foreach (var edge in edges)
         {
             edge.SetRadius(visualProperties.edgeRadius);
@@ -107,6 +108,14 @@ public class VisualPolyhedron : MonoBehaviour
         foreach (var edge in edges)
         {
             edge.SetMaterial(edgeMaterial);
+        }
+    }
+
+    public void SetSelectedEdgeMaterial(Material edgeMaterial)
+    {
+        foreach (var edge in edges)
+        {
+            edge.SetSelectedMaterial(edgeMaterial);
         }
     }
 

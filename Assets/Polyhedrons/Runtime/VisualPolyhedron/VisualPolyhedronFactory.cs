@@ -246,13 +246,11 @@ public class VisualPolyhedronFactory : MonoBehaviour
                 // edge does not exist - create it
                 edge = Instantiate<PolyhedronEdge>(axisPrefab, visualPolyhedron.transform);
                 edge.SetVisual(v1, v2, 0.1f);
-                //edge.SetVisual(v1, v2, polyhedronProperties.edgeRadius);
 
                 edgesDict.Add((index1, index2), edge);
 
                 visualPolyhedron.AddEdge(edge);
             }
-            //edge.SetVisible(polyhedronProperties.showEdges);
             return edge;
         }
 

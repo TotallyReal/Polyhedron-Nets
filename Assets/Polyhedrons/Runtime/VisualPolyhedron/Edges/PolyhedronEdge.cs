@@ -156,7 +156,6 @@ public class PolyhedronEdge : MonoBehaviour
         length = dir.magnitude;
 
         SetRadius(radius);
-        //visual.transform.localScale = new Vector3(radius, dir.magnitude / 2, radius);
 
         rotationAxis.SetAxis(from, to);
     }
@@ -167,9 +166,15 @@ public class PolyhedronEdge : MonoBehaviour
 
     }
 
+    // TODO: I don't like these methods too much.
     public void SetMaterial(Material material)
     {
-        visual.GetComponent<Renderer>().material = material;
+        visual.GetComponent<MouseTarget>().SetStandardMaterial(material);
+    }
+
+    public void SetSelectedMaterial(Material material)
+    {
+        visual.GetComponent<MouseTarget>().SetSelectedMaterial(material);
     }
 
     public void SetVisible(bool visible)

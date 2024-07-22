@@ -27,6 +27,7 @@ public class WorldRotator : MonoBehaviour
         public override string ToString() => $"{normalizedAxis}[{angle}]";
     }
 
+    // TODO: It is not clear why I need this extra parameter of rotationObject
     [Tooltip("Leave empty is the rotation is applied to this object")]
     [SerializeField] private Transform rotationObject;
     [SerializeField] private float rotationTimeSec = 1f;

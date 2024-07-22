@@ -18,7 +18,9 @@ public class ExampleFactoryStep : VisualPolyhedronFactoryStep
     [SerializeField] private PolyhedronPosition polyhedronPosition;
     [SerializeField] private bool rootDownward = true;
 
+    [Header("Mouse interaction - Choose only one")]
     [SerializeField] private bool worldRotator = true;
+    [SerializeField] private bool edgePicker = false;
 
     [Header("Random Open")]
     [Tooltip("Don't use in editor mode")]
@@ -40,10 +42,12 @@ public class ExampleFactoryStep : VisualPolyhedronFactoryStep
         if (worldRotator)
             AddWorldRotator(visualPolyhedron);
 
+        if (edgePicker && !worldRotator)
+            AddEdgePicker(visualPolyhedron);
+
         if (randomOpen)
             RandomOpen(visualPolyhedron);
     }
-
 
     public void OrientRootDownwards(VisualPolyhedron visualPolyhedron)
     {
@@ -133,6 +137,11 @@ public class ExampleFactoryStep : VisualPolyhedronFactoryStep
             rigidBody.isKinematic = true;
             rigidBody.useGravity = false;
         }
+    }
+
+    private void AddEdgePicker(VisualPolyhedron visualPolyhedron)
+    {
+        visualPolyhedron.gameObject.AddComponent<EdgePicker>();
     }
 
     public void RandomOpen(VisualPolyhedron visualPolyhedron)

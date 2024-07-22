@@ -24,6 +24,26 @@ public class MouseTarget : MonoBehaviour
         //targetRenderer.material = standardMaterial;
     }
 
+    public void SetStandardMaterial(Material material)
+    {
+        if (material != null)
+        {
+            standardMaterial = material;
+            if (!selected)
+                targetRenderer.material = standardMaterial;
+        }
+    }
+
+    public void SetSelectedMaterial(Material material)
+    {
+        if (material != null)
+        {
+            selectedMaterial = material;
+            if (selected)
+                targetRenderer.material = selectedMaterial;
+        }
+    }
+
     public bool IsSelected()
     {
         return selected;
