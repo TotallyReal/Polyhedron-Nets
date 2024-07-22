@@ -8,16 +8,17 @@ public class EdgePicker : MonoBehaviour
 {
 
     private MouseTarget selectedTarget = null;
+    private RaycastSelector.MouseEvent mouseEvent = RaycastSelector.playerMouseEvent;
 
 
     private void OnEnable()
     {
-        RaycastSelector.Instance.OnObjectPressed += OnObjectPressed;
+        mouseEvent.OnObjectSelect += OnObjectPressed;
     }
 
     private void OnDisable()
     {
-        RaycastSelector.Instance.OnObjectPressed -= OnObjectPressed;
+        mouseEvent.OnObjectSelect -= OnObjectPressed;
     }
 
     private void OnObjectPressed(object sender, Transform e)

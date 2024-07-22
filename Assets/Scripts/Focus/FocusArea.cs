@@ -17,6 +17,9 @@ public class FocusArea : Focus
     [SerializeField] private List<MonoBehaviour> scripts;
     [SerializeField] private List<GameObject> objects;
 
+
+    private RaycastSelector.MouseEvent mouseEvent = RaycastSelector.playerMouseEvent;
+
     private NetsPlayerInput input;
 
     private void Awake()
@@ -54,8 +57,8 @@ public class FocusArea : Focus
         }
         else
         {
-            if (RaycastSelector.Instance.ObjectAtMousePosition(out Transform transform)
-                && transform == clickObject)
+            Transform transform = mouseEvent.ObjectAtMousePosition();
+            if (transform == clickObject)
             {
                 TakeFocusFrom(mainFocus);
             }

@@ -10,6 +10,7 @@ public class GroupSelection : MonoBehaviour
 {
 
     public static GroupSelection Instance { get; private set; }
+    private RaycastSelector.MouseEvent mouseEvent = RaycastSelector.playerMouseEvent;
 
     public delegate void OnSelected();
     [SerializeField] private bool selectionActive = true;
@@ -31,12 +32,12 @@ public class GroupSelection : MonoBehaviour
 
     private void OnEnable()
     {
-        RaycastSelector.Instance.OnObjectPressed += OnObjectPressed;
+        mouseEvent.OnObjectSelect += OnObjectPressed;
     }
 
     private void OnDisable()
     {
-        RaycastSelector.Instance.OnObjectPressed -= OnObjectPressed;
+        mouseEvent.OnObjectSelect -= OnObjectPressed;
     }
 
 

@@ -9,16 +9,17 @@ public class FacePicker : MonoBehaviour
 {
 
     [SerializeField] private VisualPolyhedronFactory polyhedronFactory;
+    private RaycastSelector.MouseEvent mouseEvent = RaycastSelector.playerMouseEvent;
 
 
     private void OnEnable()
     {
-        RaycastSelector.Instance.OnObjectPressed += OnObjectPressed;
+        mouseEvent.OnObjectSelect += OnObjectPressed;
     }
 
     private void OnDisable()
     {
-        RaycastSelector.Instance.OnObjectPressed -= OnObjectPressed;
+        mouseEvent.OnObjectSelect -= OnObjectPressed;
     }
 
     private void OnObjectPressed(object sender, Transform e)
