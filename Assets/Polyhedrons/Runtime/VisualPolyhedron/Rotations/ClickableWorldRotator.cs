@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using static UnityEditor.IMGUI.Controls.PrimitiveBoundsHandle;
 
 
 /// <summary>
-/// Whenever the rotation object is pressed, looks for the closest rotation axis, and rotate around it.
+/// Whenever the object is pressed, looks for the closest rotation axis, and rotate around it.
+/// To use this component, the object must have a collider.
 /// </summary>
 public class ClickableWorldRotator : WorldRotator
 {
