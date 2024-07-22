@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
-using UnityEngine.UIElements;
-using System.Xml.Linq;
 
 /// <summary>
 /// Represent an "abstract" mathematical polyhedron in R^3.

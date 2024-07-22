@@ -1,4 +1,3 @@
-using Codice.CM.Common.Tree;
 using System.Collections.Generic;
 
 public class SimpleGraphNode

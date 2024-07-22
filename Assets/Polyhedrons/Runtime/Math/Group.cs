@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
 using UnityEngine;
 
 abstract public class Group<Element> : IEnumerable<Element>
