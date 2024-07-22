@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 /// <summary>
@@ -31,25 +32,12 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [SerializeField] private bool createPolyhedronOnStartup = true;
     [Header("Faces")]
     [SerializeField] private FaceMesh facePrefab;
-    [SerializeField] private bool rootDownward = true;
     [Header("Edges")]
     [SerializeField] private PolyhedronEdge axisPrefab;
     [Header("Vertices")]
     [SerializeField] private Transform vertexPrefab;
     [Header("Numbers")]
     [SerializeField] private NumberedCanvas numberedCanvasPrefab;
-    [Header("Polyhedron position")]
-    [SerializeField] private Transform positionTransform;
-    enum PolyhedronPosition
-    {
-        CENTERED,
-        ROOT
-    }
-
-    [SerializeField] private PolyhedronPosition polyhedronPosition;
-    [Header("MISC")]
-    [SerializeField] private bool randomOpen = false;
-    [SerializeField] private int seed = -1;
 
 
     private void Start()
@@ -124,6 +112,13 @@ public class VisualPolyhedronFactory : MonoBehaviour
         }
     }
 
+    #region ------------------------- Polyhedron creation -------------------------
+
+    [Tooltip("The first extra step called after generation of the polyhedron")]
+    [SerializeField] private VisualPolyhedronFactoryStep firstStep;
+    [Tooltip("The rest of the steps. Note that order of execution is not guaranteed")]
+    public UnityEvent<VisualPolyhedron> extraCreationSteps;
+
     /// <summary>
     /// Creates a new polyhedron, and destorys the previous one if exists
     /// </summary>
@@ -132,6 +127,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
         DestroyPolyhedron();
         CreateNewPolyhedron();
     }
+
 
     public void DestroyPolyhedron()
     {
@@ -161,42 +157,14 @@ public class VisualPolyhedronFactory : MonoBehaviour
     public void CreateNewPolyhedron() { 
 
         abstractPolyhedron = GetDefaultPolyhedron();
-        visualPolyhedron = CreatePolyhedron(abstractPolyhedron, rootDownward).GetComponent<VisualPolyhedron>();
+        visualPolyhedron = CreatePolyhedron(abstractPolyhedron).GetComponent<VisualPolyhedron>();
         visualPolyhedron.gameObject.name = polyhedronName != null ? polyhedronName : "Polyhedron";
-
-        visualPolyhedron.SetVisualProperties(polyhedronProperties);
-
-        // position the polyhedron
-        if (positionTransform != null) 
-        {
-            if (polyhedronPosition == PolyhedronPosition.CENTERED)
-            {
-                visualPolyhedron.transform.position = positionTransform.position;
-            }
-            if (polyhedronPosition == PolyhedronPosition.ROOT)
-            {
-                FaceMesh rootFace = visualPolyhedron.RootFace;
-                Vector3 rootPosition = rootFace.transform.TransformPoint(rootFace.Center);
-
-                visualPolyhedron.transform.position +=
-                    (positionTransform.position - rootPosition);
-            }
-        }
-
         // TODO: change parent to be the rootPosition
         visualPolyhedron.transform.SetParent(transform);
 
-        //SetDefaultFaceGraph(visualPolyhedron);
+        firstStep.FactoryStep(visualPolyhedron);
 
-        if (randomOpen)
-        {
-            if (seed > -1)
-            {
-                UnityEngine.Random.InitState(seed);
-            }
-            FaceGraph faceGraph = visualPolyhedron.GetComponent<FaceGraph>();
-            faceGraph.CreateRandomGraph();
-        }
+        extraCreationSteps?.Invoke(visualPolyhedron);
 
         if (abstractPolyhedron is AbstractGroupPolyhedron)
         {
@@ -204,13 +172,6 @@ public class VisualPolyhedronFactory : MonoBehaviour
         }
     }
 
-
-    public void AddVertices()
-    {
-        if (visualPolyhedron == null || vertexPrefab == null)
-            return;
-        visualPolyhedron.AddVertices(vertexPrefab);
-    }
     /*public FaceMesh CreatePolyhedron(Vector3[] vertices, List<int[]> facesList) // TODO restore this method
     {
         AbstractPolyhedron absPolyhedron = new AbstractPolyhedron();
@@ -226,7 +187,14 @@ public class VisualPolyhedronFactory : MonoBehaviour
         return CreatePolyhedron(absPolyhedron);
     }*/
 
-    #region -------------------- edges and faces creation --------------------
+    #region -------------------- polyhedron object creation creation --------------------
+
+    public void AddVertices()
+    {
+        if (visualPolyhedron == null || vertexPrefab == null)
+            return;
+        visualPolyhedron.AddVertices(vertexPrefab);
+    }
 
     /// <summary>
     /// Creates a new face from the given vertices, and add a numbering on it.
@@ -330,63 +298,32 @@ public class VisualPolyhedronFactory : MonoBehaviour
         return visualPolyhedron;
     }
 
-    #endregion
-
-/// <summary>
-    /// Rotates the polyhedron so that the root mesh will be facing downwards
-    /// </summary>
-    /// <param name="components"></param>
-    /// <returns></returns>
-    private void RotatePolyhedron(VisualPolyhedron visualPolyhedron)
-    {
-        Vector3 normalDir = visualPolyhedron.RootFace.Normal();
-        Vector3 rotationAxis = Vector3.Cross(normalDir, visualPolyhedron.transform.up);
-        float rotationAngle = 180 - Vector3.Angle(normalDir, visualPolyhedron.transform.up);
-
-        // rotate the polyhedron, so that the root face will be at the bottom.
-        foreach (PolyhedronEdge axis in visualPolyhedron.GetEdges())
-        {
-            axis.transform.RotateAround(Vector3.zero, rotationAxis, -rotationAngle);
-        }
-        foreach (Face face in visualPolyhedron.GetFaces())
-        {
-            face.transform.RotateAround(Vector3.zero, rotationAxis, -rotationAngle);
-        }
-    }
-
-    public GameObject CreatePolyhedron(AbstractPolyhedron absPolyhedron, bool rootDownward = true)
+    public GameObject CreatePolyhedron(AbstractPolyhedron absPolyhedron)
     {
         // ------------------- create polyhedron object -------------------
-
-
-
-        //GameObject polyhedron = new GameObject();
-
         VisualPolyhedron visualPolyhedron = Instantiate<VisualPolyhedron>(VisualPolyhedronPrefab);
         visualPolyhedron.enabled = true;
         Debug.Log("Instantiated visual polyhedron");
-        //VisualPolyhedron visualPolyhedron = polyhedron.AddComponent<VisualPolyhedron>();
-        CreateFacesAndEdges(absPolyhedron, visualPolyhedron);
-        if (rootDownward)
-        {
-            RotatePolyhedron(visualPolyhedron);  // so that the root face will face downwards
-        }
 
-        //visualPolyhedron.SetFaceMaterial(polyhedronProperties.faceMaterial);
-        //visualPolyhedron.SetEdgeMaterial(polyhedronProperties.edgeMaterial);
+        CreateFacesAndEdges(absPolyhedron, visualPolyhedron);
 
         // ------------------- face graph -------------------
         FaceGraph graph = visualPolyhedron.GetFaceGraph();
-        //FaceGraph graph = polyhedron.AddComponent<FaceGraph>();
         graph.SetPolyhedron(visualPolyhedron.RootFace, absPolyhedron.GetFaces().Count);
-        //visualPolyhedron.RootFace.SetMaterial(polyhedronProperties.rootMaterial);
-
-        // ------------------- rotator arrow -------------------
-        //rotatorArrow.SetObjectToRotate(polyhedron.transform); // TODO: remove 
 
         return visualPolyhedron.gameObject;
     }
 
+    #endregion
+
+
+    #region -------------------- extra creation steps --------------------
+
+
+    #endregion
+
+
+    #endregion
     public VisualPolyhedron GetVisualPolyhedron()
     {
         return visualPolyhedron;

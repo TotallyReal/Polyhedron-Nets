@@ -34,7 +34,7 @@ public class WorldRotator : MonoBehaviour
     private RotationOp waitingRotation = null;
     private bool isRotating;
 
-    private void Awake()
+    virtual protected void Awake()
     {
         if (rotationObject == null)
         {
