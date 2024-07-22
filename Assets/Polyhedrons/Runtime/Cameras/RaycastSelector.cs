@@ -6,123 +6,132 @@ using UnityEngine.InputSystem;
 
 public class RaycastSelector : MonoBehaviour
 {
+    /**
+     * Remember to move this class ahead in the script execution order (in project settings).
+     */
+
+
     public static RaycastSelector Instance { get; private set; }
 
-    [SerializeField] private bool mouseLogs = true;
+    /// <summary>
+    /// Used for different kind of mouse events types, e.g. left mouse, right mouse, left+control, touch, etc.
+    /// It has a mouse press event, and a position on screen.
+    /// </summary>
+    public class MouseEvent
+    {
 
-    private NetsPlayerInput input;
+        private bool mouseRaycastActive = true;
+        private bool mouseLogs = true;
+        private string name;
 
+        public InputAction MouseSelect;
+        public InputAction MousePosition;
+
+        public event EventHandler<Transform> OnObjectSelect;
+        public event EventHandler<(Transform, RaycastHit)> OnObjectSelectPlus;
+
+        public MouseEvent(string name, InputAction mouseSelect, InputAction mousePosition)
+        {
+            this.name = name;
+            MouseSelect = mouseSelect;
+            MousePosition = mousePosition;
+        }
+
+        #region ------------------------ positions and objects ------------------------
+        public Vector2 ScreenPosition()
+        {
+            return MousePosition.ReadValue<Vector2>();
+        }
+
+        public Vector3 WorldPosition()
+        {
+            return Camera.main.ScreenToWorldPoint(ScreenPosition());
+        }
+
+        public Transform ObjectAtMousePosition()
+        {
+            return RaycastSelector.ObjectAtScreenPosition(ScreenPosition(), out RaycastHit rayHit);
+        }
+
+        #endregion
+
+        #region ------------------------ events ------------------------
+
+        public void SetMouseRaycastActive(bool active)
+        {
+            mouseRaycastActive = active;
+        }
+
+        internal void OnEnable()
+        {
+            MouseSelect.performed += MousePressed;
+        }
+
+        internal void OnDisable()
+        {
+            MouseSelect.performed -= MousePressed;
+        }
+
+        private void MousePressed(InputAction.CallbackContext obj)
+        {
+            if (!mouseRaycastActive)
+                return;
+
+            Vector2 position = ScreenPosition();
+            Transform objPressed = ObjectAtScreenPosition(position, out RaycastHit rayHit);
+            if (objPressed != null)
+            {
+                if (mouseLogs)
+                    Debug.Log($"{name}: {objPressed.gameObject.name} pressed at position {position}");
+                OnObjectSelect?.Invoke(this, objPressed);
+                OnObjectSelectPlus?.Invoke(this, (objPressed, rayHit));
+            }
+        }
+
+        #endregion
+    }
+
+
+    public static Transform ObjectAtScreenPosition(Vector2 screenPoint, out RaycastHit rayHit)
+    {
+        //RaycastHit2D rayHit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(screenPoint));
+        if (!Physics.Raycast(Camera.main.ScreenPointToRay(screenPoint), out rayHit))
+            return null;
+
+        // TODO: read about GetRayIntersectionNonAlloc
+
+        if (!rayHit.collider)
+            return null;
+        return rayHit.transform;
+    }
+
+
+    // TODO: should not be public
+    public static MouseEvent playerMouseEvent;
+
+
+    private MouseInput input;
 
     void Awake()
     {
+        if (Instance != null)
+            return;
         Instance = this;
 
-        mousePosition = DefaultMousePosition;
-        input = new NetsPlayerInput();
-        input.MouseSelection.Enable();
+        input = new MouseInput();
+        input.Player.Enable();
+
+        playerMouseEvent = new MouseEvent(
+            "Player", input.Player.PointerSelect, input.Player.PointerPosition);
     }
 
     private void OnEnable()
     {
-        input.MouseSelection.EdgeSelect.performed += MousePressed;
+        playerMouseEvent.OnEnable();
     }
 
     private void OnDisable()
     {
-        input.MouseSelection.EdgeSelect.performed -= MousePressed;
+        playerMouseEvent.OnEnable();
     }
-
-    #region --------------- mouse raycast ---------------
-
-    [SerializeField] private bool mouseRaycastActive = false;
-    public delegate Vector2 MousePosition();
-    private MousePosition mousePosition;
-
-    public void SetMouseRaycastActive(bool active)
-    {
-        mouseRaycastActive = active;
-    }
-
-    /// <summary>
-    /// This event is invoked whenever an object with collider is pressed with the mouse,
-    /// as long as the mouseRaycastActive is on.
-    /// </summary>
-    public event EventHandler<Transform> OnObjectPressed;
-
-
-    public event EventHandler<(Transform, RaycastHit)> OnObjectPressedPlus;
-
-    /// <summary>
-    /// Return the position of the mouse on screen, used for raycasting.
-    /// </summary>
-    /// <returns></returns>
-    private Vector2 DefaultMousePosition()
-    {
-        return Mouse.current.position.ReadValue();
-    }
-
-    public void ChangeMousePositionForRaycasts(MousePosition mousePosition)
-    {
-        this.mousePosition = (mousePosition != null) ? mousePosition : DefaultMousePosition;
-    }
-
-    private void MousePressed(InputAction.CallbackContext obj)
-    {
-        if (!mouseRaycastActive)
-            return;
-        if (ScreenRaycastObject(mousePosition(), out Transform mouseObject, out RaycastHit hit))
-        {
-            if (mouseLogs)
-                Debug.Log($"{mouseObject.gameObject.name} pressed");
-            OnObjectPressed?.Invoke(this, mouseObject);
-            OnObjectPressedPlus?.Invoke(this, (mouseObject, hit));
-        }
-    }
-
-    public bool ObjectAtMousePosition(out Transform mouseObject)
-    {
-        return ScreenRaycastObject(mousePosition(), out mouseObject, out RaycastHit hit);
-    }
-
-    #endregion
-
-    #region --------------- (static) screen raycast ---------------
-
-    public static bool ScreenRaycast(Vector2 screenPoint, out RaycastHit hit)
-    {
-        Ray ray = Camera.main.ScreenPointToRay(screenPoint);
-        return Physics.Raycast(ray, out hit);
-    }
-
-    /// <summary>
-    /// Checks if there is an object with collider at the given screenPoint. If so returns true 
-    /// and puts the object's transform in the out variable. Otherwise returns false.
-    /// </summary>
-    /// <param name="objectTransform">The possible object at the screenPoint position</param>
-    /// <returns>A bool showing if there is an objected pointed at</returns>
-    public static bool ScreenRaycastObject(
-        Vector2 screenPoint, out Transform objectTransform, out RaycastHit hit)
-    {
-        objectTransform = null;
-
-        if (ScreenRaycast(screenPoint, out hit))
-        {
-            objectTransform = hit.transform;
-            return true;
-        }
-        return false;
-    }
-
-    /*public static bool ScreenRaycastOfType<T>(Vector2 screenPoint, out T raycastObject)
-    {
-        if (ScreenRaycastObject(screenPoint, out Transform objectTransform))
-        {
-            return objectTransform.gameObject.TryGetComponent<T>(out raycastObject);
-        }
-
-        raycastObject = default;
-        return false;
-    }*/
-
-    #endregion
 }
