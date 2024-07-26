@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using static UnityEditor.IMGUI.Controls.PrimitiveBoundsHandle;
 
 
 /// <summary>
@@ -27,35 +26,14 @@ public class WorldRotator : MonoBehaviour
         public override string ToString() => $"{normalizedAxis}[{angle}]";
     }
 
-    // TODO: It is not clear why I need this extra parameter of rotationObject
-    [Tooltip("Leave empty is the rotation is applied to this object")]
-    [SerializeField] private Transform rotationObject;
     [SerializeField] private float rotationTimeSec = 1f;
 
     private RotationOp waitingRotation = null;
     private bool isRotating;
 
-    virtual protected void Awake()
+    protected void DeleteWaitinRotation()
     {
-        if (rotationObject == null)
-        {
-            rotationObject = transform;
-        }
-    }
-
-    public Transform GetRotationObject()
-    {
-        return rotationObject;
-    }
-
-    public void SetRotationObject(Transform rotationObject)
-    {
-        if (rotationObject != null)
-        {
-            this.rotationObject = rotationObject;
-            waitingRotation = null;
-            isRotating = false;
-        }
+        waitingRotation = null;
     }
 
     private void FinishedRotating()

@@ -1,5 +1,5 @@
 {
-    "name": "PlayerInput",
+    "name": "DefaultMouseInput",
     "maps": [
         {
             "name": "Player",
@@ -11,7 +11,8 @@
                     "id": "079d8a8c-9a6b-4352-b1a9-114ed1036b13",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "PointerPosition",
@@ -19,7 +20,17 @@
                     "id": "2f0824e4-aacd-411d-958a-2e9e8be9474d",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "AlternativePointerSelect",
+                    "type": "Button",
+                    "id": "6a8f8879-df49-4bfe-8a90-462c2d90a5ce",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -42,6 +53,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "PointerPosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7dbffe26-6c30-4739-aa81-73603e3082ab",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AlternativePointerSelect",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

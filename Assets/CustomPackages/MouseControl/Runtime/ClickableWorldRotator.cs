@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
-using static WorldRotator;
 
 
 /// <summary>
@@ -11,17 +9,30 @@ using static WorldRotator;
 /// </summary>
 public class ClickableWorldRotator : WorldRotator
 {
+    [Tooltip("Leave empty is the rotation is applied to this object")]
+    [SerializeField] private Transform rotationControlObject;
     // TODO: I hate everything about this
     [SerializeField] private List<RotationOp> axes = new List<RotationOp>();
     [SerializeField] private bool debugLines;
-    private RaycastSelector.MouseEvent mouseEvent;
+    [SerializeField] private MouseTypeEvent mouseEvent;
 
-    protected override void Awake()
+    protected void Awake()
     {
-        base.Awake();
-        mouseEvent = RaycastSelector.playerMouseEvent;
+        if (rotationControlObject == null)
+        {
+            rotationControlObject = transform;
+        }
     }
 
+
+    public void SetRotationControlObject(Transform rotationControlObject)
+    {
+        if (rotationControlObject != null)
+        {
+            DeleteWaitinRotation();
+            this.rotationControlObject = rotationControlObject;
+        }
+    }
 
     public void SetRotationOp(List<RotationOp> rotations)
     {
@@ -38,7 +49,7 @@ public class ClickableWorldRotator : WorldRotator
         {
             foreach (RotationOp rotationOp in axes)
             {
-                Debug.DrawLine(new Vector3(0, 0, 0), rotationOp.normalizedAxis * 10, color: Color.white);
+                Debug.DrawLine(transform.position, transform.TransformPoint(rotationOp.normalizedAxis * 10), color: Color.white);
             }
         }
     }
@@ -73,11 +84,11 @@ public class ClickableWorldRotator : WorldRotator
         return closestRotOp;
     }
 
-    private void Rotate(object sender, (Transform, RaycastHit) e)
+    private void Rotate(object sender, (Transform obj, Vector3 position) args)
     {
-        if (e.Item1 == GetRotationObject())
+        if (args.obj == rotationControlObject)
         {
-            Vector3 dir = e.Item2.point - transform.position;
+            Vector3 dir = args.position - transform.position;
 
             RotateAround(ClosestRotation(dir));
         }

@@ -1,0 +1,17 @@
+{
+  "name": "com.totallyreal.mousecontrol",
+  "version": "1.0.0",
+  "displayName": "Mouse Control",
+  "description": "Some simple mouse controls",
+  "unity": "2022.3",
+  "keywords": [
+    "mouse"
+  ],
+  "author": {
+    "name": "Ofir",
+    "email": "TotallyReal@gmail.com"
+  },
+  "dependencies": {
+    "com.unity.inputsystem": "1.7.0" 
+  }
+}
