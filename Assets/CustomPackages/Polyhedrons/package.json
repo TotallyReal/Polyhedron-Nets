@@ -19,7 +19,6 @@
     "email": "TotallyReal@gmail.com",
     "url": "https://www.unity3d.com"
   },
-  "type": "module",
   "dependencies": {
     "com.unity.inputsystem": "1.7.0",
     "com.totallyreal.mousecontrol": "1.0.0"

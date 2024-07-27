@@ -269,6 +269,7 @@ GameObject:
   - component: {fileID: 81695492}
   - component: {fileID: 81695495}
   - component: {fileID: 81695497}
+  - component: {fileID: 81695498}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -399,6 +400,50 @@ MonoBehaviour:
       m_Flags: 0
     m_Flags: 0
   reference: {fileID: 4856405814145950343, guid: 055285f04584edc4b8ac251baf0b4d32, type: 3}
+--- !u!114 &81695498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81695491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!1 &145845324
 GameObject:
   m_ObjectHideFlags: 0
@@ -787,8 +832,8 @@ MonoBehaviour:
   positionTransform: {fileID: 170586195}
   polyhedronPosition: 0
   rootDownward: 1
-  worldRotator: 1
-  edgePicker: 0
+  worldRotator: 0
+  edgePicker: 1
   randomOpen: 0
   seed: -1
 --- !u!114 &170586194
@@ -809,7 +854,7 @@ MonoBehaviour:
   polyhedronProperties: {fileID: 11400000, guid: 5e5dabedb2019fb419c6e1a88a822be8, type: 2}
   createPolyhedronOnStartup: 1
   facePrefab: {fileID: 4496706682133013413, guid: d0f8c8e0b3f30ab48bb4f3bcad56487a, type: 3}
-  axisPrefab: {fileID: 6820755328241383506, guid: 53a73507b27643f49880569680aaa671, type: 3}
+  axisPrefab: {fileID: 0}
   vertexPrefab: {fileID: 0}
   numberedCanvasPrefab: {fileID: 5375164846631267126, guid: 6b7b10394835d0a46945efddac0c6860, type: 3}
   firstStep: {fileID: 170586192}
@@ -4065,6 +4110,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1232786870}
   - component: {fileID: 1232786869}
+  - component: {fileID: 1232786871}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -4149,6 +4195,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &1232786871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1232786868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!1 &1246982118
 GameObject:
   m_ObjectHideFlags: 0

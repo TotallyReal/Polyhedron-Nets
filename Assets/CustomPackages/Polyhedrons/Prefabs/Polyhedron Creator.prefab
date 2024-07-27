@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5830859400427116465
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8308542424823609026}
+  - component: {fileID: 1351982473293017107}
+  - component: {fileID: 7675777505118721229}
+  m_Layer: 0
+  m_Name: Polyhedron Creator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8308542424823609026
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5830859400427116465}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1351982473293017107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5830859400427116465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6da22188e9bde9f4ca26bc28dbfdd88c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  polyhedronName: Main Polyhedron
+  VisualPolyhedronPrefab: {fileID: 2446640748550310183, guid: 38ede0f892fc6da459443049582b0cf5, type: 3}
+  defaultShape: 0
+  polyhedronProperties: {fileID: 11400000, guid: 5e5dabedb2019fb419c6e1a88a822be8, type: 2}
+  createPolyhedronOnStartup: 1
+  facePrefab: {fileID: 4496706682133013413, guid: 844ed39d59105e54abdf8a98f891d1ac, type: 3}
+  axisPrefab: {fileID: 6820755328241383506, guid: 27f86c77c5bf8ae4eae77027e63f25b3, type: 3}
+  vertexPrefab: {fileID: 0}
+  numberedCanvasPrefab: {fileID: 5375164846631267126, guid: f87eb17b5552d7f47a9aa3a5b55f3e84, type: 3}
+  firstStep: {fileID: 7675777505118721229}
+  extraCreationSteps:
+    m_PersistentCalls:
+      m_Calls: []
+  visualPolyhedron: {fileID: 0}
+--- !u!114 &7675777505118721229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5830859400427116465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 286340fea1a7928408ecd3c6496b9e29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  polyhedronProperties: {fileID: 11400000, guid: 5e5dabedb2019fb419c6e1a88a822be8, type: 2}
+  positionTransform: {fileID: 8308542424823609026}
+  polyhedronPosition: 0
+  rootDownward: 1
+  worldRotator: 0
+  edgePicker: 1
+  randomOpen: 0
+  seed: -1
