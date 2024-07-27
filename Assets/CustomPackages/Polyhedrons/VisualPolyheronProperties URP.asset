@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: VisualPolyheronProperties URP
   m_EditorClassIdentifier: 
   radius: 1
-  faceMaterial: {fileID: 2100000, guid: 08044cc2b89ac2f4f9b656de4d17f296, type: 2}
-  rootMaterial: {fileID: 2100000, guid: 5eae0ad677ca0af489c322cad58d1e09, type: 2}
+  faceMaterial: {fileID: 2100000, guid: ee978126fe8d2404780ea7d7cc4475bb, type: 2}
+  rootMaterial: {fileID: 2100000, guid: 6413a9258bd97f04ba7e44d41332f09f, type: 2}
   edgeRadiusRatio: 0.1
   showEdges: 1
-  edgeMaterial: {fileID: 2100000, guid: 63093e170fb5bc847b046dcd51b65d1c, type: 2}
-  selectedEdgeMaterial: {fileID: 2100000, guid: f0c1e51dbd0533b43841aebaae337982, type: 2}
+  edgeMaterial: {fileID: 2100000, guid: 60ba7821c52925d40a721b771d441ee4, type: 2}
+  selectedEdgeMaterial: {fileID: 2100000, guid: b0b000c82b1b5e24cab4cda5dfd1f6d0, type: 2}
   numberRadiusRatio: 0.15
   showNumbers: 1
   numberLabelDistance: 0.003
