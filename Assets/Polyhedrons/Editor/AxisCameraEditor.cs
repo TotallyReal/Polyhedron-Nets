@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(AxisCamera))]
-public class VisualPolyhedronFactoryEditor : Editor
+public class AxisCameraEditor : Editor
 {
 
     public override void OnInspectorGUI()
