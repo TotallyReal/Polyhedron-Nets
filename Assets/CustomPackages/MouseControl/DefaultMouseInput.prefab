@@ -46,8 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseInputName: left mouse
   dimension: 0
-  mouseSelectReference: {fileID: -2829163755933930887, guid: 055285f04584edc4b8ac251baf0b4d32, type: 3}
-  mousePositionReference: {fileID: 4856405814145950343, guid: 055285f04584edc4b8ac251baf0b4d32, type: 3}
+  mouseSelectReference: {fileID: -2829163755933930887, guid: 97f15207fb959304886369edb4acd58a, type: 3}
+  mousePositionReference: {fileID: 4856405814145950343, guid: 97f15207fb959304886369edb4acd58a, type: 3}
 --- !u!1 &3572451026363075286
 GameObject:
   m_ObjectHideFlags: 0
@@ -94,8 +94,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseInputName: right mouse
   dimension: 0
-  mouseSelectReference: {fileID: 5822344361857103326, guid: 055285f04584edc4b8ac251baf0b4d32, type: 3}
-  mousePositionReference: {fileID: 4856405814145950343, guid: 055285f04584edc4b8ac251baf0b4d32, type: 3}
+  mouseSelectReference: {fileID: 5822344361857103326, guid: 97f15207fb959304886369edb4acd58a, type: 3}
+  mousePositionReference: {fileID: 4856405814145950343, guid: 97f15207fb959304886369edb4acd58a, type: 3}
 --- !u!1 &8428397062492061611
 GameObject:
   m_ObjectHideFlags: 0
