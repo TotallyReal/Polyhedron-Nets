@@ -787,8 +787,8 @@ MonoBehaviour:
   positionTransform: {fileID: 170586195}
   polyhedronPosition: 0
   rootDownward: 1
-  worldRotator: 0
-  edgePicker: 1
+  worldRotator: 1
+  edgePicker: 0
   randomOpen: 0
   seed: -1
 --- !u!114 &170586194

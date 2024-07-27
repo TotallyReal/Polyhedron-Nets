@@ -14,10 +14,12 @@ public class ClickableWorldRotator : WorldRotator
     // TODO: I hate everything about this
     [SerializeField] private List<RotationOp> axes = new List<RotationOp>();
     [SerializeField] private bool debugLines;
+    [Tooltip("Leave empty to use DefaultMouseTypeEvent.standard")]
     [SerializeField] private MouseTypeEvent mouseEvent;
 
     protected void Awake()
     {
+        mouseEvent = (mouseEvent == null) ? DefaultMouseTypeEvent.standard : mouseEvent;
         if (rotationControlObject == null)
         {
             rotationControlObject = transform;
