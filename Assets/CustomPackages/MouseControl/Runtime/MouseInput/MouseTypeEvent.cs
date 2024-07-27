@@ -37,7 +37,7 @@ public class MouseTypeEvent: MonoBehaviour
         MousePosition = mousePositionReference.action;
     }
 
-
+    
     public event EventHandler<Transform> OnObjectSelect;
     public event EventHandler<(Transform, Vector3)> OnObjectSelectPlus;
 

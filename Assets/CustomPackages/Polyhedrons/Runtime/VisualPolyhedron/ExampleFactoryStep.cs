@@ -1,4 +1,3 @@
-using Codice.CM.Common;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,10 +38,11 @@ public class ExampleFactoryStep : VisualPolyhedronFactoryStep
         if (positionTransform != null)
             SetPosition(visualPolyhedron);
 
+        // note that both the following consume the mouse event for this polyhedron
         if (worldRotator)
             AddWorldRotator(visualPolyhedron);
 
-        if (edgePicker && !worldRotator)
+        if (edgePicker)
             AddEdgePicker(visualPolyhedron);
 
         if (randomOpen)
@@ -139,9 +139,9 @@ public class ExampleFactoryStep : VisualPolyhedronFactoryStep
         }
     }
 
-    private void AddEdgePicker(VisualPolyhedron visualPolyhedron)
+    private EdgePicker AddEdgePicker(VisualPolyhedron visualPolyhedron)
     {
-        visualPolyhedron.gameObject.AddComponent<EdgePicker>();
+        return visualPolyhedron.gameObject.AddComponent<EdgePicker>();
     }
 
     public void RandomOpen(VisualPolyhedron visualPolyhedron)
