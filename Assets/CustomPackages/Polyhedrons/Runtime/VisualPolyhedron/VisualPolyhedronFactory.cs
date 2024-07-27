@@ -43,7 +43,6 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [Header("Numbers")]
     [SerializeField] private NumberedCanvas numberedCanvasPrefab;
 
-
     private void Start()
     {
         if (createPolyhedronOnStartup)
@@ -122,6 +121,13 @@ public class VisualPolyhedronFactory : MonoBehaviour
     [Tooltip("The rest of the steps. Note that order of execution is not guaranteed")]
     public UnityEvent<VisualPolyhedron> extraCreationSteps;
 
+
+    // TODO: Adding serializeField, so I can generate it in editor.
+    //       Need to refactor the whole code.
+    [Header("Serialized polyhedron for editor")]
+    private AbstractPolyhedron abstractPolyhedron;
+    [SerializeField] private VisualPolyhedron visualPolyhedron;
+
     /// <summary>
     /// Creates a new polyhedron, and destorys the previous one if exists
     /// </summary>
@@ -144,15 +150,10 @@ public class VisualPolyhedronFactory : MonoBehaviour
             {
                 DestroyImmediate(visualPolyhedron.gameObject);
             }
+            visualPolyhedron = null;
         }
 
     }
-
-    // TODO: Adding serializeField, so I can generate it in editor.
-    //       Need to refactor the whole code.
-    [Header("Serialized polyhedron for editor")]
-    private AbstractPolyhedron abstractPolyhedron;
-    [SerializeField] private VisualPolyhedron visualPolyhedron = null;
 
     /// <summary>
     /// Creates a new polyhedron, without destroying existing polyhedrons
@@ -160,7 +161,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
     public void CreateNewPolyhedron() { 
 
         abstractPolyhedron = GetDefaultPolyhedron();
-        visualPolyhedron = CreatePolyhedron(abstractPolyhedron).GetComponent<VisualPolyhedron>();
+        visualPolyhedron = CreatePolyhedron(abstractPolyhedron);
         visualPolyhedron.transform.localScale = Vector3.one * polyhedronProperties.radius;
         visualPolyhedron.gameObject.name = polyhedronName != null ? polyhedronName : "Polyhedron";
         // TODO: possibly change parent to be the rootPosition, also add parent in Instantiate
@@ -333,7 +334,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
         return visualPolyhedron;
     }
 
-    public GameObject CreatePolyhedron(AbstractPolyhedron absPolyhedron)
+    public VisualPolyhedron CreatePolyhedron(AbstractPolyhedron absPolyhedron)
     {
         // ------------------- create polyhedron object -------------------
         VisualPolyhedron visualPolyhedron = Instantiate<VisualPolyhedron>(VisualPolyhedronPrefab);
@@ -346,7 +347,7 @@ public class VisualPolyhedronFactory : MonoBehaviour
         FaceGraph graph = visualPolyhedron.GetFaceGraph();
         graph.SetPolyhedron(visualPolyhedron.RootFace, absPolyhedron.GetFaces().Count);
 
-        return visualPolyhedron.gameObject;
+        return visualPolyhedron;
     }
 
     #endregion
