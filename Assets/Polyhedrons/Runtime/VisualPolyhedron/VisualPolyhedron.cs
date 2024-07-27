@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // TODO: This is for generating polyhedrons in editor
@@ -17,6 +18,7 @@ public class VisualPolyhedron : MonoBehaviour
     private List<FaceMesh> faces;
     public FaceMesh RootFace { get; set; }
     private FaceGraph faceGraph;
+    [SerializeField] bool validation = false;
 
     private void Awake()
     {
@@ -35,6 +37,12 @@ public class VisualPolyhedron : MonoBehaviour
         if (edges != null && edgeMaterial != null)
         {
             SetEdgeMaterial(edgeMaterial);
+        }
+
+        if (validation)
+        {
+            SetSelectedEdges(4, 5, 6, 7, 8, 9, 10);
+            Debug.Log(String.Join(",", GetSelectedEdges()));
         }
     }
 
@@ -69,7 +77,7 @@ public class VisualPolyhedron : MonoBehaviour
         SetSelectedEdgeMaterial(visualProperties.selectedEdgeMaterial);
         foreach (var edge in edges)
         {
-            edge.SetRadius(visualProperties.edgeRadius);
+            edge.SetRadius(visualProperties.edgeRadiusRatio);
             edge.SetVisible(visualProperties.showEdges);
         }
     }
@@ -117,6 +125,28 @@ public class VisualPolyhedron : MonoBehaviour
         {
             edge.SetSelectedMaterial(edgeMaterial);
         }
+    }
+
+    public void SetSelectedEdges(params int[] edgeIndices)
+    {
+        foreach (var edge in edges)
+        {
+            edge.SetSelected(false);
+        }
+        foreach (int index in edgeIndices)
+        {
+            edges[index].SetSelected(true);
+        }
+    }
+
+    
+
+    public int[] GetSelectedEdges()
+    {
+        return edges
+            .Select((edge, index) => (selected: edge.IsSelected(), index: index))
+            .Where(selectedEdge   => selectedEdge.selected)
+            .Select(selectedEdge  => selectedEdge.index).ToArray();
     }
 
     public IEnumerable<PolyhedronEdge> GetEdges()

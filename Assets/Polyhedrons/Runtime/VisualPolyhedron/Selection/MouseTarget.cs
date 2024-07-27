@@ -29,6 +29,8 @@ public class MouseTarget : MonoBehaviour
         if (material != null)
         {
             standardMaterial = material;
+            if (targetRenderer == null)
+                targetRenderer = GetComponent<Renderer>(); // TODO: added because it can run in editor. Find a way around this.
             if (!selected)
                 targetRenderer.material = standardMaterial;
         }
@@ -39,6 +41,8 @@ public class MouseTarget : MonoBehaviour
         if (material != null)
         {
             selectedMaterial = material;
+            if (targetRenderer == null)
+                targetRenderer = GetComponent<Renderer>(); // TODO: added because it can run in editor. Find a way around this.
             if (selected)
                 targetRenderer.material = selectedMaterial;
         }
@@ -53,18 +57,25 @@ public class MouseTarget : MonoBehaviour
     {
         if (!selectable)
             return;
-        selected = !selected;
-        if (selected)
-        {
-            standardMaterial = targetRenderer.material;
-            targetRenderer.material = selectedMaterial;
-        } else {
-            targetRenderer.material = standardMaterial;
-        }
+        SetSelected(!selected);
     }
 
     public void DeselectTarget()
     {
         //targetRenderer.material = standardMaterial;
+    }
+
+    internal void SetSelected(bool selected)
+    {
+        this.selected = selected;
+        if (selected)
+        {
+            standardMaterial = targetRenderer.material;
+            targetRenderer.material = selectedMaterial;
+        }
+        else
+        {
+            targetRenderer.material = standardMaterial;
+        }
     }
 }

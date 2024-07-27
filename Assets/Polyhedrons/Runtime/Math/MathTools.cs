@@ -1,4 +1,4 @@
-using MathNet.Numerics.LinearAlgebra;
+//using MathNet.Numerics.LinearAlgebra;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +28,7 @@ static public class MathTools {
             Random.Range(minZ, maxZ)
             );
     }
-
+    /*
     public static bool TryApproximateEigenvalue(
         Matrix<float> matrix, float eigenvalue, int dim, float error, out Vector<float> eigenvector) 
     {
@@ -42,7 +42,7 @@ static public class MathTools {
         }
         eigenvector = null;
         return false;
-    }
+    }*/
 
     public static int[] RandomPermutation(int n)
     {

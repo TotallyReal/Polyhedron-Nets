@@ -114,15 +114,15 @@ public class IsoElement
     {
         return Name;
     }
-    /*
-    private Vector3 findAxis(Matrix<double> matrix)
+    
+    private Vector3 FindAxis(Matrix<double> matrix)
     {
 
         // Compute the SVD of the matrix
         MathNet.Numerics.LinearAlgebra.Factorization.Svd<double> svd = matrix.Svd();
 
         // Find the kernel of the matrix
-        double smallestEigenvalue = svd.S.Last();
+        //double smallestEigenvalue = svd.S.Last();
         Vector<double> eigenVector = svd.VT.Row(2);
         /*Vector<double> eigenVector1, ev1;
         Vector<double> eigenVector2, ev2;
@@ -138,8 +138,8 @@ public class IsoElement
         }*/
         //return Vector3.zero;
         // Print the kernel
-        /*Console.WriteLine("The kernel of the matrix is:");
-        Console.WriteLine(kernel.ToString());
+        Console.WriteLine("The kernel of the matrix is:");
+        //Console.WriteLine(kernel.ToString());
 
 
 
@@ -158,8 +158,8 @@ public class IsoElement
 
         Vector3 w = this * u;
         // since v!=u,-u, then [v,u] and [u,w]
-        return w;*/
-    //}
+        return w;
+    }
 
     private int FirstIndex<T>(IEnumerable<T> items, Func<T, bool> matchCondition)
     {
@@ -193,12 +193,15 @@ public class IsoElement
     /// <returns></returns>
     public void GetPresentation(out Vector3 axis/*, out float angle*/, out bool flip)
     {
+        flip = true;
+        axis = Vector3.zero;
         if (represented)
         {
             axis = this.axis;
             flip = this.flip;
             //return true;
         }
+
         Matrix<float> A = Matrix<float>.Build.DenseOfArray(new float[,]
         {
             { matrix[0,0], matrix[0,1], matrix[0,2] },
@@ -217,11 +220,13 @@ public class IsoElement
         // start by moving the +-1 eigenvalue and eigenvector to be the first one.
         if (A.Determinant() > 0)
         {
-            int index = FirstIndex(eigenValues, z => AlmostEqual(z, Complex.One, IsometryGroup.ERROR));
+            // has eigenvalue 1, so that A is a rotation around the corresponding eigenvector.
+            // Switch it to be the first eigenvalue\eigenvector.
 
-            Complex tempEValue = eigenValues[0];
-            eigenValues[0] = Complex.One; // = eigenValues[index] ... almost ...
-            eigenValues[index] = tempEValue;
+            int index = FirstIndex(eigenValues, z => AlmostEqual(z, Complex.One, IsometryGroup.ERROR));
+                        
+            (eigenValues[0], eigenValues[index]) = (eigenValues[index], eigenValues[0]);            
+            // eigenValues[0] is "almost" Complex.One
 
             MathNet.Numerics.LinearAlgebra.Vector<float> tempEVector = eigenVectors.Column(0);
             eigenVectors.SetColumn(0, eigenVectors.Column(index));
@@ -230,26 +235,14 @@ public class IsoElement
             // The other two eigenvalues multiple to 1 and have norm 1, so they must be conjugated, hence, 
             // this is a rotation.
             flip = false;
-            /*// is a rotation
-            eigenValues.Where(z => { return (z - Complex.One).Magnitude < IsometryGroup.ERROR; });
-            eigenValues.Find
-            for (int i = 0; i < 3; i++)
-            {
-                if ((eigenValues[i] - Complex.One).Magnitude < IsometryGroup.ERROR)
-                {
-                    Complex tempEV = eigenValues[0];
-                    eigenValues[0] = Complex.One;
-                    eigenValues[i] = tempEV;
-                }
-            }*/
+                    
         } else
         {
             // is a reflection + rotation (possibly by zero degrees)
             int index = FirstIndex(eigenValues, z => AlmostEqual(z, -Complex.One, IsometryGroup.ERROR));
 
-            Complex tempEValue = eigenValues[0];
-            eigenValues[0] = -Complex.One; // = eigenValues[index] ... almost ...
-            eigenValues[index] = tempEValue;
+            (eigenValues[0], eigenValues[index]) = (eigenValues[index], eigenValues[0]);
+            // eigenValues[0] is "almost" -Complex.One
 
             MathNet.Numerics.LinearAlgebra.Vector<float> tempEVector = eigenVectors.Column(0);
             eigenVectors.SetColumn(0, eigenVectors.Column(index));
@@ -258,28 +251,10 @@ public class IsoElement
             flip = true;
         }
         axis = new Vector3(eigenVectors[0, 0], eigenVectors[1, 0], eigenVectors[2, 0]);
-        /*Matrix<float> A = Matrix<float>.Build.DenseOfArray(new float[,]
-        {
-            { 0f,1f,0f },
-            { -3f,2f,1f },
-            { 0f,-3f,4f },
-        });*/
-        //float eigenvalue = 1f;
-        //MathTools.TryApproximateEigenvalue(A, eigenvalue, 3, IsometryGroup.ERROR, out Vector<float> eigenvector);
-        //findAxis(A);
-        //Vector<double>[] vectors = A.Kernel();
-        //Vector<double> b = Vector<double>.Build.Dense(new double[] { 8.0, -11.0, -3.0 });
 
-        // Solve the system of equations Ax = b
-        //Vector<double> x = A.Solve(b);
-
-        /*flip = false;
-        axis = Vector3.zero;
-        angle = 0;*/
         this.axis = axis;
         this.flip = flip;
         this.represented = true;
-        //return true;
     }
 
 }

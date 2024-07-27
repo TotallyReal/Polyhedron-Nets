@@ -169,12 +169,17 @@ public class PolyhedronEdge : MonoBehaviour
     // TODO: I don't like these methods too much.
     public void SetMaterial(Material material)
     {
-        visual.GetComponent<MouseTarget>().SetStandardMaterial(material);
+        target.SetStandardMaterial(material);
     }
 
     public void SetSelectedMaterial(Material material)
     {
-        visual.GetComponent<MouseTarget>().SetSelectedMaterial(material);
+        target.SetSelectedMaterial(material);
+    }
+
+    public void SetSelected(bool selected)
+    {
+        target.SetSelected(selected);
     }
 
     public void SetVisible(bool visible)
