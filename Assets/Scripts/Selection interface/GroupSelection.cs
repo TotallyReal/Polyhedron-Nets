@@ -10,7 +10,7 @@ public class GroupSelection : MonoBehaviour
 {
 
     public static GroupSelection Instance { get; private set; }
-    private RaycastSelector.MouseEvent mouseEvent = RaycastSelector.playerMouseEvent;
+    [SerializeField] private MouseTypeEvent mouseEvent;
 
     public delegate void OnSelected();
     [SerializeField] private bool selectionActive = true;

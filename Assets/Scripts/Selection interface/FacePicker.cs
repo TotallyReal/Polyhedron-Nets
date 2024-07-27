@@ -9,8 +9,7 @@ public class FacePicker : MonoBehaviour
 {
 
     [SerializeField] private VisualPolyhedronFactory polyhedronFactory;
-    private RaycastSelector.MouseEvent mouseEvent = RaycastSelector.playerMouseEvent;
-
+    [SerializeField] private MouseTypeEvent mouseEvent;
 
     private void OnEnable()
     {

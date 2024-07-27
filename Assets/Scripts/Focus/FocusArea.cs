@@ -18,7 +18,7 @@ public class FocusArea : Focus
     [SerializeField] private List<GameObject> objects;
 
 
-    private RaycastSelector.MouseEvent mouseEvent = RaycastSelector.playerMouseEvent;
+    [SerializeField] private MouseTypeEvent mouseEvent;
 
     private NetsPlayerInput input;
 

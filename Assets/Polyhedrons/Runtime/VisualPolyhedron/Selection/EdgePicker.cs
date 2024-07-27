@@ -8,7 +8,12 @@ public class EdgePicker : MonoBehaviour
 {
 
     private MouseTarget selectedTarget = null;
-    private RaycastSelector.MouseEvent mouseEvent = RaycastSelector.playerMouseEvent;
+    [SerializeField] private MouseTypeEvent mouseEvent;
+
+    private void Awake()
+    {
+        mouseEvent = (mouseEvent==null)?DefaultMouseTypeEvent.standard:mouseEvent;
+    }
 
 
     private void OnEnable()
