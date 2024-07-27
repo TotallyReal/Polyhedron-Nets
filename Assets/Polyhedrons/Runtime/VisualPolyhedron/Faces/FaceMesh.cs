@@ -41,7 +41,7 @@ public class FaceMesh : Face
         return transform.TransformDirection(LocalNormal);
     }
 
-    public void CreateMesh(params Vector3[] vertices)
+    public Mesh CreateMesh(params Vector3[] vertices)
     {
         if (meshFilter == null)
         {
@@ -101,6 +101,8 @@ public class FaceMesh : Face
         mesh.RecalculateBounds();
 
         meshCollider.sharedMesh = mesh;
+
+        return mesh;
     }
 
     public float maxAngle = 0;
@@ -117,4 +119,26 @@ public class FaceMesh : Face
         }
     }
 
+    internal void UseMesh(Mesh mesh, Vector3[] vertices)
+    {
+        if (meshFilter == null)
+        {
+            meshFilter = GetComponent<MeshFilter>();
+            //meshFilter = gameObject.AddComponent<MeshFilter>();
+            meshFilter.mesh = mesh;
+
+            meshCollider = GetComponent<MeshCollider>();
+            //gameObject.GetComponent<MeshRenderer>().sharedMaterial = colourSettings.planetMaterial; // new Material(Shader.Find("Standard"));
+        }
+
+        UpdateCenter(vertices);
+        ComputeMaxAngle(vertices);
+
+        // Assume that the next two vectors are not colinear.
+        Vector3 v = (vertices[1] - vertices[0]).normalized;
+        Vector3 u = (vertices[2] - vertices[0]).normalized;
+        LocalNormal = Vector3.Cross(v, u).normalized;
+
+        meshCollider.sharedMesh = mesh;
+    }
 }

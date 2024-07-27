@@ -2,6 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using System.IO;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -56,10 +60,10 @@ public class VisualPolyhedronFactory : MonoBehaviour
 
     public void AddCube(FaceMesh face)
     {
-        Vector3Int existingPosition = Vector3Int.CeilToInt((-face.Normal() + face.GetGlobalCenter() / polyhedronProperties.faceRadius) / 2);
+        Vector3Int existingPosition = Vector3Int.CeilToInt((-face.Normal() + face.GetGlobalCenter() / polyhedronProperties.radius) / 2);
         if (!cubePositions.Contains(existingPosition))
             return;
-        Vector3Int position = Vector3Int.CeilToInt((face.Normal() + face.GetGlobalCenter() / polyhedronProperties.faceRadius) / 2);
+        Vector3Int position = Vector3Int.CeilToInt((face.Normal() + face.GetGlobalCenter() / polyhedronProperties.radius) / 2);
         cubePositions.Add(Vector3Int.CeilToInt(position));
         // TODO : what happens when adding cubes on the root face?
         CreatePolyhedron();
@@ -67,25 +71,24 @@ public class VisualPolyhedronFactory : MonoBehaviour
 
     private AbstractPolyhedron GetDefaultPolyhedron()
     {
-        float faceRadius = polyhedronProperties.faceRadius;
         switch (defaultShape)
         {
             case PolyhedronShape.CUBE:
-                return AbstractGroupPolyhedron.Cube(faceRadius);
+                return AbstractGroupPolyhedron.Cube(1);
             case PolyhedronShape.OCTAHEDRON:
-                return AbstractGroupPolyhedron.Octahedron(faceRadius);
+                return AbstractGroupPolyhedron.Octahedron(1);
             case PolyhedronShape.TETRAHEDRON:
-                return AbstractGroupPolyhedron.Tetrahedron(faceRadius);
+                return AbstractGroupPolyhedron.Tetrahedron(1);
             case PolyhedronShape.DODECAHEDRON:
-                return AbstractGroupPolyhedron.Dodecahedron(faceRadius);                
+                return AbstractGroupPolyhedron.Dodecahedron(1);                
             case PolyhedronShape.ICOSAHEDRON:
-                return AbstractGroupPolyhedron.Isocahedron(faceRadius);
+                return AbstractGroupPolyhedron.Isocahedron(1);
             case PolyhedronShape.CUBE_COLLECTION:
                 return new CubicPolyhedron(
                     cubePositions.ToArray(),
-                    new Vector3Int(0, -2, 0), new Vector3Int(0, -1, 0), faceRadius);
+                    new Vector3Int(0, -2, 0), new Vector3Int(0, -1, 0), 1);
             default:
-                return AbstractGroupPolyhedron.Cube(faceRadius);
+                return AbstractGroupPolyhedron.Cube(1);
 
         }
     }
@@ -158,11 +161,15 @@ public class VisualPolyhedronFactory : MonoBehaviour
 
         abstractPolyhedron = GetDefaultPolyhedron();
         visualPolyhedron = CreatePolyhedron(abstractPolyhedron).GetComponent<VisualPolyhedron>();
+        visualPolyhedron.transform.localScale = Vector3.one * polyhedronProperties.radius;
         visualPolyhedron.gameObject.name = polyhedronName != null ? polyhedronName : "Polyhedron";
-        // TODO: change parent to be the rootPosition
+        // TODO: possibly change parent to be the rootPosition, also add parent in Instantiate
         visualPolyhedron.transform.SetParent(transform);
 
-        firstStep.FactoryStep(visualPolyhedron);
+        if (firstStep != null)
+        {
+            firstStep.FactoryStep(visualPolyhedron);
+        }
 
         extraCreationSteps?.Invoke(visualPolyhedron);
 
@@ -208,7 +215,37 @@ public class VisualPolyhedronFactory : MonoBehaviour
         FaceMesh face = Instantiate(facePrefab, visualPolyhedron.transform);
         face.ID = index;
         face.name = $"Face {index}";
-        face.CreateMesh(faceVertices);
+
+        string meshName = $"{defaultShape.ToString()}/{face.name}";
+        string assetPath = $"Assets/Meshes/{meshName}.asset";
+        Mesh mesh;
+
+
+#if UNITY_EDITOR
+        mesh = AssetDatabase.LoadAssetAtPath<Mesh>(assetPath);
+        if (mesh != null)
+        {
+            face.UseMesh(mesh, faceVertices);
+        }
+        else
+        {
+            mesh = face.CreateMesh(faceVertices);
+            Directory.CreateDirectory(Path.GetDirectoryName(assetPath));
+            AssetDatabase.CreateAsset(mesh, assetPath);
+            AssetDatabase.SaveAssets();
+        }
+#else
+        mesh = Resources.Load<Mesh>($"Meshes/{meshName}");
+        if (mesh != null)
+        {
+            face.UseMesh(mesh, faceVertices);
+        } else 
+        {
+            face.CreateMesh(faceVertices);
+        }
+#endif
+
+        //face.CreateMesh(faceVertices);
 
         if (addNumbering)
         {
@@ -216,14 +253,14 @@ public class VisualPolyhedronFactory : MonoBehaviour
             numberedCanvas1.SetPosition(
                 center: face.Center + polyhedronProperties.numberLabelDistance * face.LocalNormal.normalized,
                 direction: -face.LocalNormal);
-            numberedCanvas1.SetRadius(polyhedronProperties.numberRadius);
+            numberedCanvas1.SetRadius(polyhedronProperties.numberRadiusRatio);
             numberedCanvas1.SetNumber(index);
 
             NumberedCanvas numberedCanvas2 = Instantiate<NumberedCanvas>(numberedCanvasPrefab, face.transform);
             numberedCanvas2.SetPosition(
                 center: face.Center - polyhedronProperties.numberLabelDistance * face.LocalNormal.normalized,
                 direction: face.LocalNormal);
-            numberedCanvas2.SetRadius(polyhedronProperties.numberRadius);
+            numberedCanvas2.SetRadius(polyhedronProperties.numberRadiusRatio);
             numberedCanvas2.SetNumber(index);
         }
 
